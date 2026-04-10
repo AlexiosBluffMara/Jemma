@@ -1,0 +1,3 @@
+{"scenario_id":"smoke-ok","prompt":"Reply with exactly OK","validator":"exact_text","expected":"OK","tags":["smoke"]}
+{"scenario_id":"json-ready","prompt":"Return a JSON object with a single key named status and value ready.","validator":"json_object","tags":["json"]}
+

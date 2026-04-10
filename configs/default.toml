@@ -1,0 +1,19 @@
+[app]
+name = "jemma"
+state_dir = "state"
+artifacts_dir = "artifacts"
+
+[provider.ollama]
+base_url = "http://127.0.0.1:11434"
+timeout_s = 120
+
+[agent]
+default_model = "gemma4-e4b-it-q8"
+planner_model = "gemma4-e4b-it-q8"
+validator_model = "gemma4-e2b-it-q4"
+fallback_model = "gemma4-e2b-it-q4"
+max_steps = 4
+
+[safety]
+actuation_enabled = false
+

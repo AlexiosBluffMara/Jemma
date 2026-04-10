@@ -1,0 +1,3 @@
+{"scenario_id":"safebrain-summary","system":"You are a concise safety operations assistant.","prompt":"Summarize why a private-network Gemma benchmark lab with Tailscale and deny-by-default actuation is useful. Use the words local, secure, and benchmark.","validator":"contains_all","expected_keywords":["local","secure","benchmark"],"tags":["qa","safety"]}
+{"scenario_id":"fallback-value","system":"You are a concise infrastructure planner.","prompt":"Explain why E2B is a good fallback when larger Gemma models are unavailable. Use the words fallback and latency.","validator":"contains_all","expected_keywords":["fallback","latency"],"tags":["qa","routing"]}
+

@@ -1,0 +1,32 @@
+[[models]]
+model_id = "gemma4-e4b-it-q8"
+provider = "ollama"
+remote_name = "gemma4-e4b-it:q8_0"
+context_window = 131072
+quantization = "q8_0"
+tags = ["workstation", "default", "benchmark"]
+
+[[models]]
+model_id = "gemma4-e2b-it-q4"
+provider = "ollama"
+remote_name = "gemma4-e2b-it:q4_k_m"
+context_window = 131072
+quantization = "q4_k_m"
+tags = ["fallback", "mobile", "benchmark"]
+
+[[models]]
+model_id = "gemma4-e4b-it-bf16"
+provider = "ollama"
+remote_name = "gemma4-e4b-it:bf16"
+context_window = 131072
+quantization = "bf16"
+tags = ["baseline", "high-fidelity"]
+
+[[models]]
+model_id = "gemma4-e2b-it-bf16"
+provider = "ollama"
+remote_name = "gemma4-e2b-it:bf16"
+context_window = 131072
+quantization = "bf16"
+tags = ["baseline", "fallback"]
+

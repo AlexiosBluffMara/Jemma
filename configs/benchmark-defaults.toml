@@ -1,0 +1,10 @@
+[run]
+repetitions = 2
+warmup_runs = 1
+capture_system_metrics = true
+
+[metrics]
+track_latency_ms = true
+track_validator_score = true
+track_gpu_probe = true
+

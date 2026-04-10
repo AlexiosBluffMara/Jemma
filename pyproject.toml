@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jemma"
+version = "0.1.0"
+description = "Autonomous local Gemma agent framework with benchmark orchestration."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Copilot" }]
+dependencies = []
+
+[project.scripts]
+jemma = "jemma.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

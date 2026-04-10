@@ -1,0 +1,20 @@
+[hue]
+enabled = true
+bridge_ip = "192.168.1.10"
+allowlisted_rooms = ["office"]
+allowlisted_lights = ["desk-lamp"]
+
+[smartplug]
+enabled = true
+allowlisted_plugs = ["demo-lamp"]
+endpoint = "http://127.0.0.1:8787/plug"
+api_key_env = "SMARTPLUG_API_KEY"
+
+[tailscale]
+enabled = true
+
+[router_status]
+enabled = true
+gateway_ip = "192.168.1.1"
+dns_test_host = "1.1.1.1"
+
