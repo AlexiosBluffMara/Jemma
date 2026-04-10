@@ -1,41 +1,29 @@
 # Unsloth local RTX 5090 workflow
 
-## What the Unsloth notebook is
-The original `gemma4-31b-unsloth.ipynb` is a **Colab-oriented supervised fine-tuning notebook** from the Unsloth ecosystem. Its flow is:
-
-1. install Unsloth and the Hugging Face training stack,
-2. load a Gemma 4 model in quantized form,
-3. add LoRA adapters so only a small fraction of weights are trained,
-4. format conversational data into the Gemma 4 chat template,
-5. train with TRL's `SFTTrainer`,
-6. save adapters or export merged model artifacts.
-
-It is good as a reference, but it assumes a hosted notebook runtime and includes Colab/Kaggle-friendly defaults such as lightweight smoke-test data and a multi-device-friendly `device_map`.
+## What the notebook is for
+The original `gemma4-31b-unsloth.ipynb` is a Colab-oriented supervised fine-tuning notebook from the Unsloth ecosystem. The local variant keeps the same core flow but turns it into a workstation-oriented single-GPU pipeline.
 
 ## What changed in the local variant
-`gemma4-31b-unsloth-local-5090.ipynb` is the local-first version for this machine profile:
+`gemma4-31b-unsloth-local-5090.ipynb` remains the repo's main local notebook, but it should now be treated as an E4B and E2B-first workflow rather than a 31B-first workflow.
 
-- **GPU:** RTX 5090
-- **RAM:** 64 GB
-- **Storage:** large SSD-backed dataset/cache directories
-- **Target workflow:** local QLoRA training with explicit output paths
+Recommended ladder:
 
-The new notebook:
+1. `unsloth/gemma-4-E4B-it` as the primary local fine-tuning loop.
+2. `unsloth/gemma-4-E2B-it` as the mobile and offline-friendly follow-up target.
+3. `unsloth/gemma-4-31B-it` only after the data and prompt pipeline are stable.
 
-- keeps the core Unsloth flow,
-- switches to **single-GPU local loading** with `device_map='auto'`,
-- defaults to **`unsloth/gemma-4-31B-it` in 4-bit**,
-- uses **SSD-backed cache, dataset, checkpoint, and export directories**,
-- supports **WSL/Linux and Windows path detection**,
-- expects a prepared local JSONL file for the Second Brain project,
-- falls back to a small public dataset for smoke testing.
+Why this order works better on a single RTX 5090:
+
+- E4B is much faster to iterate on while still preserving long-context and agentic behavior.
+- E2B gives you a realistic path to phone-friendly exports.
+- 31B is still valuable for final comparisons, but it is an expensive debugging target.
 
 ## Why WSL/Linux is the best option
-Use **WSL2 Ubuntu** or native Linux unless you have a strong reason not to.
+Use WSL2 Ubuntu or native Linux unless you have a strong reason not to.
 
 Reasons:
 
-- CUDA and LLM tooling are usually more stable on Linux/WSL.
+- CUDA and LLM tooling are usually more stable on Linux or WSL.
 - `bitsandbytes`, Triton-backed tooling, and export flows tend to be smoother there.
 - Most surrounding tooling for evaluation, serving, and data prep also assumes Linux paths and shells.
 
@@ -61,17 +49,26 @@ uv pip install unsloth --torch-backend=auto
 uv pip install datasets trl accelerate sentencepiece pillow torchvision
 ```
 
-### Optional environment variables
-These are the main knobs used by the new notebook:
+## Recommended environment variables
+These are the main knobs used by the local notebook.
 
+### Primary workstation run
 ```bash
 export JEMMA_WORKSPACE_DIR=/home/soumitty/Jemma
 export JEMMA_DATA_DIR=/mnt/d/JemmaData
-export JEMMA_MODEL_NAME=unsloth/gemma-4-31B-it
-export JEMMA_MAX_SEQ_LENGTH=4096
+export JEMMA_MODEL_NAME=unsloth/gemma-4-E4B-it
+export JEMMA_MAX_SEQ_LENGTH=16384
 export JEMMA_BATCH_SIZE=1
 export JEMMA_GRAD_ACC=8
 export JEMMA_EPOCHS=1
+export JEMMA_ARTIFACT_SLUG=gemma4-e4b-second-brain
+```
+
+### Mobile-friendly follow-up run
+```bash
+export JEMMA_MODEL_NAME=unsloth/gemma-4-E2B-it
+export JEMMA_MAX_SEQ_LENGTH=8192
+export JEMMA_ARTIFACT_SLUG=gemma4-e2b-second-brain
 ```
 
 ## Recommended dataset shape
@@ -89,14 +86,30 @@ The notebook accepts JSONL rows in one of these forms:
 {"prompt":"...","response":"..."}
 ```
 
-For the project, the best path is to build a **prepared training file** such as:
+For this repo, the preferred path is still a prepared training file such as:
 
 `/mnt/d/JemmaData/datasets/second-brain-train.jsonl`
 
-and keep raw source dumps, parsed chunks, and embedding corpora in separate directories.
+The recommended public-data source bundle is in `docs/second-brain-data-plan.md`.
 
 ## Practical tuning guidance
-- Start with **31B 4-bit QLoRA**.
-- Keep **batch size 1** and adjust with gradient accumulation first.
-- Use **4096 context** until the pipeline is stable, then increase carefully.
-- Save LoRA adapters first; only export merged or GGUF artifacts when needed.
+- Start with E4B 4-bit QLoRA, not 31B.
+- Use E2B after E4B when you want a phone-friendly or faster follow-up target.
+- Treat the full 128K context window as an inference goal, not a first-pass training default.
+- Start training at 8K to 16K sequence length, then increase only after memory use and loss look stable.
+- Keep batch size 1 and adjust with gradient accumulation first.
+- Save LoRA adapters first; only export merged or GGUF artifacts when you need Ollama or mobile deployment.
+
+## Export path to Ollama and mobile
+The notebook can save:
+
+- LoRA adapters,
+- merged checkpoints,
+- GGUF exports.
+
+Recommended usage:
+
+1. fine-tune E4B in the notebook,
+2. export the adapter first,
+3. export a merged or GGUF version only when you are ready to register it in Ollama,
+4. use E2B exports for the mobile fallback path.

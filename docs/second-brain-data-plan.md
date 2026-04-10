@@ -246,6 +246,15 @@ Maintain a ledger for every chosen dataset with:
 - whether it is used for **SFT**, **RAG**, **eval**, or **demo only**,
 - whether embeddings and public demos are acceptable.
 
+## Model rollout for this dataset plan
+Tie the public dataset plan to the model rollout in this order:
+
+1. `unsloth/gemma-4-E4B-it` as the primary SFT target for the first serious training loop.
+2. `unsloth/gemma-4-E2B-it` as the follow-up target for mobile-friendly exports and faster iteration.
+3. `unsloth/gemma-4-31B-it` only after the prompt format, retrieval flow, and evaluation loop are already stable.
+
+This keeps the dataset curation work aligned with the actual deployment plan instead of overfitting the first pass to the largest model.
+
 ## Exact training recommendation for the current notebook
 For `gemma4-31b-unsloth-local-5090.ipynb`, the best first training run is:
 
