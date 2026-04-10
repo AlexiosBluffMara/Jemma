@@ -1,167 +1,258 @@
-# Second Brain dataset and pipeline plan
+# Licensed Kaggle-only Second Brain plan
 
-## Project direction
-The strongest version of a Gemma-based **Second Brain** for this workspace is a **multimodal operational memory assistant**:
+## Decision
+The best win-oriented direction is **not** a generic offline NotebookLM clone. The strongest rules-safe version is:
 
-- remembers conversations, meetings, and notes,
-- retrieves structured incident, inspection, and maintenance records,
-- answers grounded questions over that memory,
-- optionally reasons over construction/safety/infrastructure images.
+## **Jemma SafeBrain**
+An **offline, Gemma-4-powered second brain for construction and industrial safety** that can:
 
-That gives a clearer hackathon story than a generic chatbot while still supporting high-impact tracks such as safety, resilience, and education.
+- ingest PDFs, manuals, incident reports, and notes,
+- answer grounded questions with citations,
+- summarize long documents into action items,
+- generate risk assessments in a structured format,
+- inspect construction images for PPE and obvious safety issues,
+- run locally with Gemma 4 + Ollama + Unsloth.
 
-## Best public dataset starting points
-These are the best first-wave public datasets to use as building blocks.
+This gives a clearer story, stronger impact, and a better shot at the **Main Track**, **Safety & Trust**, **Global Resilience**, **Ollama**, and **Unsloth**-style prize angles than a broad “does everything” assistant.
 
-| Dataset | Modality | Best use |
-| --- | --- | --- |
-| SQuAD | text | grounded QA and retrieval evaluation |
-| HotpotQA | text | multi-hop retrieval evaluation |
-| MultiWOZ 2.2 | dialogue | multi-turn assistant behavior and state tracking |
-| DailyDialog | dialogue | conversational polish and intent flow |
-| Meeting Transcripts | text | summarization, recall, action-item extraction |
-| Industrial Safety and Health Analytics | tabular + text | incident memory and safety recommendations |
-| OSHA Injury Data | tabular | trend summaries and risk retrieval |
-| Aircraft Historical Maintenance Dataset | structured + text | maintenance-log retrieval and troubleshooting memory |
-| LA Building and Safety Inspections | structured | inspection history and compliance lookup |
-| National Bridge Inventory | structured | infrastructure memory and asset-level retrieval |
-| Hard Hat Detection | image | PPE detection |
-| Construction Site Safety Image Dataset | image | construction hazard scene understanding |
-| Worksite Safety Monitoring Dataset | image | safety compliance classification/detection |
-| Surface Crack Detection | image | defect and crack detection |
-| RDD 2022 | image | road and highway damage detection |
+## Core principle
+Use **fine-tuning only for narrow behaviors** that the base model plus RAG will not reliably do on its own:
 
-## Recommended dataset bundles
-### Fast MVP
-- MultiWOZ 2.2
-- Meeting Transcripts
+1. grounded, citation-heavy answers,
+2. structured safety/risk outputs,
+3. retrieval-aware responses over injected context.
+
+Do **not** waste training budget on generic summarization, generic chat, or generic document QA. Gemma 4 already does those well enough; use retrieval and prompting there.
+
+## Tight dataset collection
+These are the recommended **licensed Kaggle datasets only**, with their exact role in the system.
+
+| Priority | Dataset | Kaggle slug | License | Purpose | Use in project | Why it helps you win |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1 | Industrial Safety & Health Analytics | `ihmstefanini/industrial-safety-and-health-analytics-database` | CC0 | safety-domain grounding | **Primary SFT source** plus a small retrieval corpus | Gives you a real-world, high-impact domain and lets you train domain-specific responses instead of a generic chatbot |
+| 2 | Stanford Question Answering Dataset (SQuAD) | `stanfordu/stanford-question-answering-dataset` | CC BY-SA 4.0 | grounded QA benchmark | **Eval only** | Lets you report measurable grounded QA quality instead of making vague claims |
+| 3 | CNN/DailyMail summarization | `gowrishankarp/newspaper-text-summarization-cnn-dailymail` | CC0 | summarization benchmark | **Eval and demo content**, not SFT | Shows that your offline system can summarize long inputs well, which is central to a NotebookLM-like pitch |
+| 4 | Construction Site Safety Image Dataset | `snehilsanyal/construction-site-safety-image-dataset-roboflow` | CC BY 4.0 | construction safety vision demo | **Demo and optional vision evaluation** | Gives the video pitch a strong visual “wow” moment with site-safety analysis |
+| 5 | Safety Helmet Detection | `andrewmvd/hard-hat-detection` | CC0 | PPE detection demo support | **Demo support**, not text SFT | Strengthens the safety story and gives you more robust PPE examples for screenshots/video |
+| 6 | arXiv Metadata | `Cornell-University/arxiv` | CC0 | large document-library prototype | **RAG corpus prototype**, not SFT | Proves the product can scale to large offline knowledge libraries and supports a “PDF brain” narrative |
+| 7 | Human Conversation Training Data | `projjal1/human-conversation-training-data` | CC0 | optional response-style polish | **Optional tiny SFT supplement** | Low priority fallback if you want to lightly tune tone, but it should not drive the project |
+
+## Exact purpose of each dataset
+
+### 1. Industrial Safety & Health Analytics
+**What it is for**
+- the main **fine-tuning source**
+- a small domain retrieval corpus
+- structured risk-assessment examples
+
+**How to use it**
+- turn each incident row into several instruction examples:
+  - summarize the incident,
+  - identify likely root cause,
+  - assign a risk level,
+  - recommend corrective action,
+  - answer a question using the incident text as cited context
+
+**Why it matters**
+- this is the dataset that actually gives Gemma a domain specialization
+- it makes the demo feel like a real safety assistant rather than a general-purpose LLM
+- it directly supports a strong high-impact story for judging
+
+**Use with Unsloth**
+- yes, this is the best dataset in the shortlist for **actual LoRA fine-tuning**
+
+### 2. SQuAD
+**What it is for**
+- grounded question-answering evaluation
+
+**How to use it**
+- run retrieval-style QA evaluations
+- report metrics in the writeup
+
+**Why it matters**
+- judges trust measurable results more than generic claims
+- it proves that the system answers from source context rather than hallucinating
+
+**Use with Unsloth**
+- **no**
+- use it for evaluation only
+
+### 3. CNN/DailyMail
+**What it is for**
+- summarization evaluation
+- long-document demo content
+
+**How to use it**
+- benchmark summaries
+- show a “turn large source material into concise briefings” workflow
+- use sample articles as stand-ins while the PDF ingestion flow is still being built
+
+**Why it matters**
+- the NotebookLM-style pitch depends heavily on summarization quality
+- this gives you a clean benchmark and demo material quickly
+
+**Use with Unsloth**
+- **no**
+- Gemma 4 already summarizes well; use this as eval/demo data
+
+### 4. Construction Site Safety Image Dataset
+**What it is for**
+- image-based construction hazard and PPE demo
+
+**How to use it**
+- show Gemma analyzing job-site images
+- pair image observations with text output like:
+  - missing helmet,
+  - unsafe area,
+  - suggested follow-up action
+
+**Why it matters**
+- it gives your project a memorable visual differentiator
+- it makes the pitch feel broader than “offline PDF chatbot”
+
+**Use with Unsloth**
+- usually **not** for this first pass
+- use it in the demo and evaluation pipeline first
+
+### 5. Safety Helmet Detection
+**What it is for**
+- extra PPE-focused visual examples
+
+**How to use it**
+- support the construction image demo
+- create stronger video and screenshot artifacts
+
+**Why it matters**
+- improves storytelling and confidence in the safety use case
+
+**Use with Unsloth**
+- **no** for text fine-tuning
+
+### 6. arXiv Metadata
+**What it is for**
+- large-scale offline library prototype
+- “bring your own document universe” story
+
+**How to use it**
+- use as a stand-in large corpus for indexing, retrieval, clustering, and topic exploration
+- position it as the scale proof for the PDF-second-brain architecture
+
+**Why it matters**
+- shows your system is not limited to a tiny safety database
+- supports the “NotebookLM but offline” narrative
+
+**Use with Unsloth**
+- **no**
+- this is retrieval/indexing data, not SFT data
+
+### 7. Human Conversation Training Data
+**What it is for**
+- minor conversational cleanup only
+
+**How to use it**
+- only if needed for response style polish after domain tuning
+
+**Why it matters**
+- low impact compared with the safety domain data
+
+**Use with Unsloth**
+- optional, low priority
+
+## What should actually be fine-tuned
+Keep the SFT scope tight.
+
+### Fine-tune on
+- **Industrial Safety & Health Analytics** transformed into:
+  - grounded QA pairs,
+  - incident summaries,
+  - risk classification outputs,
+  - corrective-action recommendations,
+  - citation-style answers
+
+### Do not fine-tune on
 - SQuAD
-- Industrial Safety and Health Analytics
-- Aircraft Historical Maintenance Dataset
+- CNN/DailyMail
+- construction image datasets
+- arXiv metadata
 
-This is the fastest path to a useful text-first assistant that can remember, summarize, retrieve, and answer.
+Those should be used for **evaluation, retrieval, and demo content**, not for LoRA training.
 
-### Strong demo MVP
-- Industrial Safety and Health Analytics
-- OSHA Injury Data
-- Hard Hat Detection
-- Construction Site Safety Image Dataset
-- RDD 2022
+## Best product concept
 
-This is the best short-term path for a visually compelling safety or field-inspection assistant.
+### **Top choice: Jemma SafeBrain**
+**Pitch:** an offline second brain for safety-critical work. Feed it manuals, reports, PDFs, and site images; it returns grounded answers, summaries, risk assessments, and safety observations.
 
-### Ambitious multimodal version
-- MultiWOZ 2.2
-- Meeting Transcripts
-- HotpotQA
-- Aircraft Historical Maintenance Dataset
-- LA Building and Safety Inspections
-- National Bridge Inventory
-- Construction Site Safety Image Dataset
-- Hard Hat Detection
-- RDD 2022
+### Why this beats the alternatives
+- **Construction / engineering** has a stronger impact story than a generic MBA tutor
+- **Offline PDF + notes + image reasoning** is closer to a differentiated NotebookLM replacement
+- **Safety** gives a better human-centered and socially useful story for hackathon judging
+- it aligns naturally with local inference, Unsloth fine-tuning, and a vivid demo
 
-## Compliance guidance
-### Safest sources
-- Kaggle datasets with clear, documented licenses
-- StackExchange data when attribution and license obligations are preserved
-- self-created or synthetic project data
+## Backup concepts
 
-### Use with caution
-- embedding indexes built from third-party text
-- mixed-source web corpora
-- private or semi-private operational documents
+### Backup 1: Offline academic paper brain
+Use:
+- `Cornell-University/arxiv`
+- `stanfordu/stanford-question-answering-dataset`
+- `gowrishankarp/newspaper-text-summarization-cnn-dailymail`
 
-### Avoid for hackathon speed
-- Reddit dumps with unclear downstream rights
-- broad web-scraped corpora without a provenance ledger
-- any source with missing license terms or personal-data concerns
+This is simpler and cleaner, but it is less emotionally compelling and weaker on the visual side.
 
-### Required project discipline
-Maintain a dataset ledger with:
+### Backup 2: Offline teaching and briefing assistant
+Use:
+- `gowrishankarp/newspaper-text-summarization-cnn-dailymail`
+- `stanfordu/stanford-question-answering-dataset`
+- `projjal1/human-conversation-training-data`
 
-- source name and URL,
-- license and terms URL,
-- allowed use notes,
+This can support business or teaching-style demos, but it is much less distinctive and probably less competitive.
+
+## Why MBA/teaching is not the top recommendation
+Right now, the strongest **licensed Kaggle-only** path is the construction/safety angle. It has:
+
+- clearer real-world value,
+- better demo visuals,
+- better alignment with “offline AI that helps people in the field,”
+- stronger multi-prize overlap.
+
+An MBA-student tutor can still be built, but it is likely to feel more generic unless you later find a high-quality, clearly licensed Kaggle business-teaching corpus that materially improves the story.
+
+## Exact win-oriented dataset bundle
+
+### Must use
+1. `ihmstefanini/industrial-safety-and-health-analytics-database`
+2. `stanfordu/stanford-question-answering-dataset`
+3. `gowrishankarp/newspaper-text-summarization-cnn-dailymail`
+4. `snehilsanyal/construction-site-safety-image-dataset-roboflow`
+
+### Strong add-on
+5. `andrewmvd/hard-hat-detection`
+
+### Optional scale demo
+6. `Cornell-University/arxiv`
+
+## Compliance filter
+Only use Kaggle datasets that have:
+
+- a clearly stated license,
+- acceptable attribution requirements,
+- no obvious personal-data issues,
+- terms consistent with training, retrieval, embeddings, and public demo use.
+
+Maintain a ledger for every chosen dataset with:
+
+- Kaggle URL,
+- license,
 - attribution requirements,
-- privacy notes,
-- whether embedding/indexing is allowed,
-- whether redistribution is allowed,
-- final decision: `use`, `use-with-limits`, or `do-not-use`.
+- whether it is used for **SFT**, **RAG**, **eval**, or **demo only**,
+- whether embeddings and public demos are acceptable.
 
-## Easiest practical pipeline
-### 1. Ingest raw sources into cloud storage
-Use a single bucket layout such as:
+## Exact training recommendation for the current notebook
+For `gemma4-31b-unsloth-local-5090.ipynb`, the best first training run is:
 
-- `gs://jemma-raw/`
-- `gs://jemma-parsed/`
-- `gs://jemma-embeddings/`
+1. build a curated JSONL from **Industrial Safety & Health Analytics**,
+2. create around **1,000-2,000** high-quality instruction examples,
+3. train only on those safety-domain examples,
+4. leave summarization and general document QA to the base model plus retrieval,
+5. use the other datasets for evaluation and the pitch demo.
 
-Load:
-
-- Kaggle/public datasets,
-- internal Reddit or StackExchange dumps only after a license/privacy pass,
-- domain CSVs, JSONL, inspection tables, and image datasets.
-
-### 2. Parse and normalize with a cloud dataflow stage
-Use a Dataflow or Beam pipeline to:
-
-- normalize schemas,
-- redact obvious sensitive fields,
-- split long documents into chunks,
-- convert records into chat pairs, summaries, retrieval chunks, and eval sets,
-- write canonical JSONL and parquet outputs.
-
-### 3. Create Gemini embeddings in the cloud
-Use the cloud project to build embeddings for:
-
-- retrieval chunks,
-- safety incidents,
-- inspection and maintenance logs,
-- meeting and conversational memory records.
-
-Keep embeddings and metadata in a managed vector store or a simple chunk-plus-index export that can be mirrored locally.
-
-### 4. Train locally on the RTX 5090
-Use the local Unsloth notebook for:
-
-- instruction tuning on prepared JSONL chat data,
-- domain adaptation for second-brain prompts,
-- focused safety and maintenance response behavior,
-- fast iteration on LoRA checkpoints.
-
-Keep the heavy base-model download, training loop, adapter checkpoints, and exports on the local SSD.
-
-### 5. Use cloud + local together
-The easiest split is:
-
-- **cloud:** ingestion, cleaning, chunking, embedding, large-scale preprocessing,
-- **local 5090:** LoRA fine-tuning, smoke evals, export, and rapid iteration,
-- **runtime app:** retrieve from the embedding index, then call the locally adapted Gemma model for grounded answers.
-
-## Construction and infrastructure angle
-For a construction-focused variant, prioritize:
-
-- Hard Hat Detection
-- Construction Site Safety Image Dataset
-- Worksite Safety Monitoring Dataset
-- Surface Crack Detection
-- RDD 2022
-- OSHA Injury Data
-- bridge and inspection tables
-
-That combination supports:
-
-- PPE checks,
-- hazard spotting,
-- crack or roadway defect identification,
-- inspection memory,
-- safety recommendation retrieval.
-
-## Suggested first implementation scope
-Build the first version around:
-
-1. a text-first retrieval memory assistant,
-2. one visual safety or crack-detection capability,
-3. a dataset ledger and provenance discipline from day one,
-4. local QLoRA fine-tuning on the 5090 with cloud preprocessing upstream.
+That is the tightest, most rules-safe, and most competition-friendly plan from the current licensed Kaggle options.
