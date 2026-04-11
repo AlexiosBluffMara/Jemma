@@ -1,6 +1,6 @@
 ---
 name: RecursiveWorker
-description: "Lightweight recursive task executor running on GPT 5.4 xhigh, optimized for speed and cost efficiency on high-volume bulk operations. Specializes in text editing, file formatting, code cleanup, boilerplate generation, search-and-replace across codebases, config file generation, README/documentation updates, data transformation (CSV/JSON/YAML), template expansion, and repetitive refactoring. Designed to be spawned recursively by other agents (FleetCommander, KaggleCompetitor, GoogleMLScientist) for parallelizable grunt work. Executes fast, reports back concisely, and never over-engineers. Handles batches of 10-100+ file operations per invocation. Chicago-based, part of the Gemma 4 Good Hackathon agent fleet."
+description: "Use when doing bulk repo edits, formatting, config generation, boilerplate creation, or repetitive cleanup work."
 argument-hint: "Describe the bulk text operation, file editing task, or repetitive work you need done. Provide specific file paths, patterns to match, replacements to make, or templates to expand. Be explicit about scope and expected output format."
 model: gpt-5.4-xhigh
 tools: grep_search, file_search, read_file, create_file, replace_string_in_file, multi_replace_string_in_file, run_in_terminal, list_dir

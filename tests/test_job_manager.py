@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import tempfile
+import time
 import unittest
 from pathlib import Path
 import sys
@@ -63,6 +64,7 @@ class JobManagerTests(unittest.TestCase):
                 current = manager.get_job(job["job_id"])
                 if current and current["status"] == "succeeded":
                     break
+                time.sleep(0.01)
             else:
                 self.fail("job did not complete")
 

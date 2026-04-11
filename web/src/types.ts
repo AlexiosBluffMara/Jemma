@@ -5,6 +5,37 @@ export type ProviderHealth = {
   models: string[];
 };
 
+export type ChatMessage = {
+  role: "system" | "user" | "assistant" | "tool";
+  content: string;
+};
+
+export type ChatRequest = {
+  model?: string;
+  system?: string;
+  messages: ChatMessage[];
+  options?: Record<string, unknown>;
+  response_format?: "json" | null;
+  timeout_s?: number;
+};
+
+export type ChatResponse = {
+  model: string;
+  content: string;
+  raw: Record<string, unknown>;
+  total_duration_ms?: number | null;
+  prompt_eval_count?: number | null;
+  eval_count?: number | null;
+};
+
+export type CapabilityDescriptor = {
+  name: string;
+  actions: string[];
+  allowlisted_targets: string[];
+  require_confirmation: boolean;
+  summary: string;
+};
+
 export type ModelSpec = {
   model_id: string;
   provider: string;

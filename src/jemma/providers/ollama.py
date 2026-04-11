@@ -12,14 +12,14 @@ class OllamaProvider:
         self.base_url = config.ollama_base_url.rstrip("/")
         self.timeout_s = config.ollama_timeout_s
 
-    def _request(self, method: str, path: str, payload: dict | None = None) -> dict:
+    def _request(self, method: str, path: str, payload: dict | None = None, *, timeout_s: int | None = None) -> dict:
         body = None
         headers = {"Content-Type": "application/json"}
         if payload is not None:
             body = json.dumps(payload).encode("utf-8")
         req = request.Request(f"{self.base_url}{path}", data=body, headers=headers, method=method)
         try:
-            with request.urlopen(req, timeout=self.timeout_s) as response:
+            with request.urlopen(req, timeout=timeout_s or self.timeout_s) as response:
                 return json.loads(response.read().decode("utf-8"))
         except error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")
@@ -40,16 +40,19 @@ class OllamaProvider:
 
     def chat(self, request_data: ChatRequest) -> ChatResponse:
         resolved_model = self.config.models.get(request_data.model)
+        messages = list(request_data.messages)
+        if request_data.system:
+            messages = [{"role": "system", "content": request_data.system}, *messages]
         payload: dict[str, object] = {
             "model": resolved_model.remote_name if resolved_model else request_data.model,
-            "messages": request_data.messages,
+            "messages": messages,
             "stream": False,
             "options": request_data.options,
         }
         if request_data.response_format == "json":
             payload["format"] = "json"
 
-        response = self._request("POST", "/api/chat", payload=payload)
+        response = self._request("POST", "/api/chat", payload=payload, timeout_s=request_data.timeout_s)
         message = response.get("message", {})
         content = message.get("content", "")
         total_duration = response.get("total_duration")

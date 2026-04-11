@@ -8,6 +8,17 @@ import sys
 import traceback
 from pathlib import Path
 
+repo_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(repo_root / "src"))
+
+from jemma.notebook_support import (
+    build_deployment_manifest,
+    build_env_defaults,
+    build_notebook_paths,
+    resolve_dataset_path,
+    validate_dataset_file,
+)
+
 
 PHASES = [
     "setup",
@@ -42,31 +53,8 @@ SMOKE_DATASET_ROWS = [
     },
 ]
 
-
-def build_env_defaults(repo_root: Path) -> dict[str, str]:
-    smoke_root = repo_root / "state" / "notebook-smoke"
-    return {
-        "JEMMA_WORKSPACE_DIR": str(repo_root),
-        "JEMMA_DATA_DIR": str(smoke_root),
-        "JEMMA_MODEL_NAME": "unsloth/gemma-4-E2B-it",
-        "JEMMA_MAX_SEQ_LENGTH": "512",
-        "JEMMA_SMOKE_TEST_ROWS": "8",
-        "JEMMA_BATCH_SIZE": "1",
-        "JEMMA_GRAD_ACC": "1",
-        "JEMMA_EPOCHS": "1",
-        "JEMMA_MAX_STEPS": "1",
-        "JEMMA_WARMUP_STEPS": "0",
-        "JEMMA_LOGGING_STEPS": "1",
-        "JEMMA_SAVE_STEPS": "1000",
-        "JEMMA_SAVE_TOTAL_LIMIT": "1",
-        "JEMMA_GEN_MAX_NEW_TOKENS": "64",
-        "JEMMA_SAVE_MERGED_16BIT": "0",
-        "JEMMA_SAVE_GGUF": "0",
-    }
-
-
 def ensure_smoke_dataset(repo_root: Path) -> Path:
-    dataset_path = repo_root / "state" / "notebook-smoke" / "datasets" / "second-brain-train.jsonl"
+    dataset_path = build_notebook_paths(repo_root)["smoke_dataset"]
     dataset_path.parent.mkdir(parents=True, exist_ok=True)
     if not dataset_path.exists():
         dataset_path.write_text(
@@ -101,11 +89,32 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    repo_root = Path(__file__).resolve().parents[1]
     os.chdir(repo_root)
     for key, value in build_env_defaults(repo_root).items():
         os.environ.setdefault(key, value)
     smoke_dataset = ensure_smoke_dataset(repo_root)
+    dataset_path = resolve_dataset_path(repo_root)
+    dataset_validation = None
+    if dataset_path.exists():
+        try:
+            dataset_validation = validate_dataset_file(dataset_path)
+        except ValueError as exc:
+            report = {
+                "python_executable": sys.executable,
+                "python_version": sys.version,
+                "notebook": str(args.notebook),
+                "smoke_dataset": str(smoke_dataset),
+                "env": {key: os.environ.get(key) for key in sorted(build_env_defaults(repo_root))},
+                "phases": {phase: "pending" for phase in PHASES},
+                "first_failure": {
+                    "phase": "dataset_validation",
+                    "traceback": str(exc),
+                },
+            }
+            args.report_path.parent.mkdir(parents=True, exist_ok=True)
+            args.report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+            print(str(exc))
+            return 1
 
     args.report_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -116,9 +125,11 @@ def main() -> int:
         "python_version": sys.version,
         "notebook": str(args.notebook),
         "smoke_dataset": str(smoke_dataset),
+        "dataset_validation": dataset_validation,
         "env": {key: os.environ.get(key) for key in sorted(build_env_defaults(repo_root))},
         "phases": {phase: "pending" for phase in PHASES},
         "first_failure": None,
+        "deployment_manifest": None,
     }
 
     print("NOTEBOOK:", args.notebook)
@@ -145,6 +156,15 @@ def main() -> int:
             return 1
 
     args.report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    deployment_manifest = build_deployment_manifest(shared_globals)
+    deployment_manifest_path = (
+        Path(deployment_manifest["export_dir"]) / f"{deployment_manifest['artifact_slug']}-deployment-manifest.json"
+    )
+    deployment_manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    deployment_manifest_path.write_text(json.dumps(deployment_manifest, indent=2), encoding="utf-8")
+    report["deployment_manifest"] = str(deployment_manifest_path)
+    args.report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print(f"Deployment manifest: {deployment_manifest_path}")
     print("\nAll notebook code cells executed successfully.")
     return 0
 

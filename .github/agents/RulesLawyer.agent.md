@@ -1,6 +1,6 @@
 ---
 name: Rules Lawyer
-description: policy/rules interpretation specialist
+description: "Use when interpreting rules, policies, constraints, conflicts, or allowed/prohibited behavior."
 model: claude-opus-4.6-20250514
 tools:
   - read_file

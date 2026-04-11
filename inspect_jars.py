@@ -2,20 +2,42 @@
 """
 Inspect Android Studio JAR files without extracting them.
 Uses zipfile module for read-only access.
+Comprehensive search for build/version metadata.
 """
 
 import zipfile
 import os
 from pathlib import Path
 
-jar_files = [
-    r"C:\Program Files\Android\Android Studio\plugins\android\lib\wizard-template.jar",
-    r"C:\Program Files\Android\Android Studio\plugins\android\lib\android-gradle.jar",
-    r"C:\Program Files\Android\Android Studio\plugins\android\lib\libagp-version.jar"
-]
+jar_dir = r"C:\Program Files\Android\Android Studio\plugins\android\lib"
 
-keywords = ['agp', 'gradle', 'version', 'buildtools', 'compilesdk']
-extensions = ['.properties', '.xml', '.gradle']
+# Explicit targets
+target_names = ['wizard-template.jar', 'android-gradle.jar', 'libagp-version.jar']
+
+# Additional keywords for file discovery
+search_patterns = ['agp', 'gradle', 'version']
+
+# Find all matching JAR files
+all_jars = [f for f in os.listdir(jar_dir) if f.endswith('.jar')] if os.path.exists(jar_dir) else []
+jar_files = []
+
+# Add explicit targets
+for jar in all_jars:
+    if jar in target_names:
+        jar_files.append(os.path.join(jar_dir, jar))
+
+# Add pattern matches (case-insensitive)
+for jar in all_jars:
+    jar_lower = jar.lower()
+    for pattern in search_patterns:
+        if pattern in jar_lower and os.path.join(jar_dir, jar) not in jar_files:
+            jar_files.append(os.path.join(jar_dir, jar))
+            break
+
+jar_files = sorted(set(jar_files))
+
+keywords = ['agp', 'gradle', 'version', 'buildtools', 'compilesdk', 'build-tools', 'sdk']
+extensions = ['.properties', '.xml', '.gradle', '.json', '.mf']
 
 def inspect_jar(jar_path):
     """Inspect a JAR file without extracting"""

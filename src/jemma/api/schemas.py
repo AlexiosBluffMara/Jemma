@@ -36,3 +36,38 @@ class StressBenchmarkRequest(BaseModel):
     visibility: Literal["local", "public"] = "local"
     options: dict[str, Any] = Field(default_factory=dict)
 
+
+class ChatMessage(BaseModel):
+    role: Literal["system", "user", "assistant", "tool"] = "user"
+    content: str = Field(min_length=1)
+
+
+class ChatRequestBody(BaseModel):
+    model: str | None = None
+    system: str = ""
+    messages: list[ChatMessage] = Field(default_factory=list)
+    options: dict[str, Any] = Field(default_factory=dict)
+    response_format: Literal["json"] | None = None
+    timeout_s: int = Field(default=120, ge=1, le=600)
+
+
+class ChatResponseBody(BaseModel):
+    model: str
+    content: str
+    raw: dict[str, Any]
+    total_duration_ms: int | None = None
+    prompt_eval_count: int | None = None
+    eval_count: int | None = None
+
+
+class CapabilityDescriptor(BaseModel):
+    name: str
+    actions: list[str] = Field(default_factory=list)
+    allowlisted_targets: list[str] = Field(default_factory=list)
+    require_confirmation: bool = True
+    summary: str = ""
+
+
+class CapabilityListResponse(BaseModel):
+    capabilities: list[CapabilityDescriptor] = Field(default_factory=list)
+

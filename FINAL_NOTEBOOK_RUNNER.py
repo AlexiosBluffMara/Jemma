@@ -126,13 +126,16 @@ def main():
     log(f"Start Time: {datetime.now().isoformat()}")
     log()
     
-    # Setup
-    repo_root = Path(r"d:\JemmaRepo\Jemma")
-    py_exe = r"d:\unsloth\studio\.venv\Scripts\python.exe"
-    notebook = r"d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb"
-    runner = r"d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py"
-    report_path = repo_root / "state" / "notebook-smoke" / "notebook_run_report.json"
-    results_path = repo_root / "state" / "notebook-smoke" / "notebook_execution_results.json"
+    repo_root = Path(__file__).resolve().parent
+    sys.path.insert(0, str(repo_root / "src"))
+    from jemma.notebook_support import build_notebook_paths, collect_preflight, resolve_python_executable
+
+    paths = build_notebook_paths(repo_root)
+    py_exe_path = resolve_python_executable(repo_root, os.environ.get("JEMMA_NOTEBOOK_PYTHON"))
+    notebook = Path(os.environ.get("JEMMA_NOTEBOOK_PATH", str(paths["notebook"])))
+    runner = Path(os.environ.get("JEMMA_NOTEBOOK_RUNNER", str(paths["runner"])))
+    report_path = paths["report_path"]
+    results_path = paths["results_path"]
     
     # Ensure output directory exists
     results_path.parent.mkdir(parents=True, exist_ok=True)
@@ -140,19 +143,50 @@ def main():
     results = {
         "start_time": datetime.now().isoformat(),
         "script_version": "1.0",
-        "python_exe": py_exe,
-        "notebook": notebook,
+        "python_exe": str(py_exe_path) if py_exe_path else None,
+        "notebook": str(notebook),
         "repo_root": str(repo_root),
         "commands": {},
         "summary": {}
     }
+
+    preflight = collect_preflight(repo_root, py_exe_path)
+    results["preflight"] = preflight
+    log("\n" + "="*80)
+    log("PREFLIGHT", level="PHASE")
+    log("="*80)
+    log(json.dumps(preflight, indent=2))
+
+    if py_exe_path is None:
+        results["summary"]["status"] = "BLOCKED_BY_PYTHON_ENV"
+        results["summary"]["message"] = "No notebook Python environment was found. Set JEMMA_NOTEBOOK_PYTHON to the Unsloth-capable interpreter."
+        results["end_time"] = datetime.now().isoformat()
+        results_path.write_text(json.dumps(results, indent=2))
+        log(f"Results saved to: {results_path}")
+        return 1
+
+    if not notebook.exists() or not runner.exists():
+        results["summary"]["status"] = "BLOCKED_BY_PATHS"
+        results["summary"]["message"] = "Notebook or notebook runner path is missing."
+        results["end_time"] = datetime.now().isoformat()
+        results_path.write_text(json.dumps(results, indent=2))
+        log(f"Results saved to: {results_path}")
+        return 1
+
+    if preflight.get("dataset_error"):
+        results["summary"]["status"] = "BLOCKED_BY_DATASET"
+        results["summary"]["message"] = str(preflight["dataset_error"])
+        results["end_time"] = datetime.now().isoformat()
+        results_path.write_text(json.dumps(results, indent=2))
+        log(f"Results saved to: {results_path}")
+        return 1
     
     # COMMAND 1: Python Version
     log("\n" + "="*80)
     log("PHASE 1: PYTHON VERSION CHECK", level="PHASE")
     log("="*80)
     success1, output1, rc1, error1 = run_command(
-        [py_exe, "--version"],
+        [str(py_exe_path), "--version"],
         "Check Python version in Unsloth environment",
         timeout=30
     )
@@ -168,7 +202,7 @@ def main():
     log("PHASE 2: DEPENDENCY CHECK", level="PHASE")
     log("="*80)
     success2, output2, rc2, error2 = run_command(
-        [py_exe, "-c", "import torch, unsloth, datasets, trl; print('all ok')"],
+        [str(py_exe_path), "-c", "import torch, unsloth, datasets, trl, transformers, accelerate; print('all ok')"],
         "Verify torch, unsloth, datasets, trl are installed and importable",
         timeout=120
     )
@@ -216,9 +250,9 @@ def main():
     log("")
     
     success3, output3, rc3, error3 = run_command(
-        [py_exe, runner, notebook],
+        [str(py_exe_path), str(runner), str(notebook)],
         "Execute notebook cells through run_notebook_cells.py",
-        timeout=4000  # 66+ minutes to be safe
+        timeout=int(os.environ.get("JEMMA_NOTEBOOK_TIMEOUT_S", "4000"))
     )
     results["commands"]["cmd3_notebook"] = {
         "success": success3,

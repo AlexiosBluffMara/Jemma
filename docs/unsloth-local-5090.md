@@ -113,3 +113,12 @@ Recommended usage:
 2. export the adapter first,
 3. export a merged or GGUF version only when you are ready to register it in Ollama,
 4. use E2B exports for the mobile fallback path.
+
+## Deployment handoff
+The notebook executor now emits a deployment manifest after a successful run. When you want a hosted Ollama endpoint on Google Cloud:
+
+1. rerun the notebook with `JEMMA_SAVE_GGUF=1`,
+2. keep the generated `*-deployment-manifest.json`,
+3. run `python toolbox/prepare_ollama_cloud_bundle.py <manifest-path>`.
+
+See `docs/google-cloud-ollama-deployment.md` for the hosted path.

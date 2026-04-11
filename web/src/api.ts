@@ -1,4 +1,15 @@
-import type { BenchmarkPreset, JobEvent, JobRecord, ModelSpec, ProviderHealth, RunRecord, SystemPayload } from "./types";
+import type {
+  BenchmarkPreset,
+  CapabilityDescriptor,
+  ChatRequest,
+  ChatResponse,
+  JobEvent,
+  JobRecord,
+  ModelSpec,
+  ProviderHealth,
+  RunRecord,
+  SystemPayload
+} from "./types";
 
 async function jsonFetch<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, {
@@ -13,6 +24,17 @@ async function jsonFetch<T>(url: string, init?: RequestInit): Promise<T> {
 
 export function getHealth(): Promise<{ ok: boolean; provider: ProviderHealth }> {
   return jsonFetch("/api/health");
+}
+
+export function sendChat(payload: ChatRequest): Promise<ChatResponse> {
+  return jsonFetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify(payload)
+  });
+}
+
+export function getCapabilities(): Promise<{ capabilities: CapabilityDescriptor[] }> {
+  return jsonFetch("/api/capabilities");
 }
 
 export function getModels(): Promise<{ models: ModelSpec[] }> {

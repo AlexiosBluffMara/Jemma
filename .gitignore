@@ -5,6 +5,10 @@ artifacts/runs/
 state/*.db
 state/*.sqlite
 configs/secrets.toml
-web\node_modules\
-web\dist\
+web/node_modules/
+web/dist/
+android-app/.gradle/
+android-app/build/
+android-app/app/build/
+android-app/local.properties
 

@@ -6,7 +6,7 @@ from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from jemma.api.routes import benchmarks, health, jobs, models, objectives, runs, system
+from jemma.api.routes import benchmarks, capabilities, chat, health, jobs, models, objectives, runs, system
 from jemma.config.loader import load_app_config
 from jemma.core.store import ArtifactStore
 from jemma.providers.registry import build_provider
@@ -40,6 +40,8 @@ def create_app() -> FastAPI:
     app.include_router(health.router, prefix="/api")
     app.include_router(models.router, prefix="/api")
     app.include_router(system.router, prefix="/api")
+    app.include_router(chat.router, prefix="/api")
+    app.include_router(capabilities.router, prefix="/api")
     app.include_router(jobs.router, prefix="/api")
     app.include_router(runs.router, prefix="/api")
     app.include_router(benchmarks.router, prefix="/api")
