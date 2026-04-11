@@ -14,6 +14,23 @@ validator_model = "gemma4-e2b-it-q4"
 fallback_model = "gemma4-e2b-it-q4"
 max_steps = 4
 
+[discord]
+server_name = "Alexios Bluff Mara Research"
+community_name = "Alexios Bluff Mara"
+github_repo = "AlexiosBluffMara/Jemma"
+entry_role = "visitor"
+member_role = "researcher"
+moderator_role = "moderator"
+bot_operator_role = "bot-operator"
+subscriber_role = "supporter"
+enable_server_subscriptions = true
+
+[discord.oauth]
+client_id_env = "DISCORD_CLIENT_ID"
+guild_id_env = "DISCORD_GUILD_ID"
+redirect_uri = "http://127.0.0.1:8080/discord/oauth/callback"
+scopes = ["bot", "applications.commands"]
+
 [safety]
 actuation_enabled = false
 

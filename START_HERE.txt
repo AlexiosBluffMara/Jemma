@@ -1,0 +1,296 @@
+================================================================================
+                     NOTEBOOK EXECUTION QUICK START
+================================================================================
+
+👉 START HERE: Copy and paste this command into Command Prompt (cmd.exe):
+
+    cd /d d:\JemmaRepo\Jemma && d:\unsloth\studio\.venv\Scripts\python.exe FINAL_NOTEBOOK_RUNNER.py
+
+Then wait 10-60+ minutes for completion.
+
+
+================================================================================
+                        WHAT THIS DOES
+================================================================================
+
+This command will:
+
+1. Check Python version in Unsloth environment
+   Expected: Python 3.x.x
+
+2. Verify all required packages are installed
+   Expected: "all ok"
+
+3. Execute the Gemma 4 + Unsloth notebook
+   Expected: 10 phases of training and model export
+   Duration: 10-65+ minutes (first time includes model download)
+
+4. Generate JSON report with status
+   Location: state/notebook-smoke/notebook_run_report.json
+
+If successful, you'll see: "✓ ALL PASSED" at the end.
+
+
+================================================================================
+                       ALTERNATIVES
+================================================================================
+
+If the command above doesn't work, try one of these:
+
+OPTION 1 - Batch file:
+   cd /d d:\JemmaRepo\Jemma && run_all_commands.bat
+
+OPTION 2 - Manual one-by-one:
+   cd /d d:\JemmaRepo\Jemma
+   d:\unsloth\studio\.venv\Scripts\python.exe --version
+   d:\unsloth\studio\.venv\Scripts\python.exe -c "import torch, unsloth, datasets, trl; print('all ok')"
+   d:\unsloth\studio\.venv\Scripts\python.exe toolbox\run_notebook_cells.py gemma4-31b-unsloth-local-5090.ipynb
+
+OPTION 3 - Python script (alternative):
+   cd /d d:\JemmaRepo\Jemma && d:\unsloth\studio\.venv\Scripts\python.exe execute_notebook.py
+
+
+================================================================================
+                    DOCUMENTATION GUIDE
+================================================================================
+
+START HERE (Quick Start):
+  → This file (you are reading it)
+
+DETAILED GUIDE (Step by Step):
+  → README_NOTEBOOK_EXECUTION.md (10 KB)
+    Read this if you want step-by-step instructions and troubleshooting
+
+COMPLETE REFERENCE (Everything):
+  → NOTEBOOK_EXECUTION_AUDIT.txt (14 KB)
+    Read this for comprehensive documentation, environment variables, and debugging
+
+TECHNICAL REPORT (What Happened):
+  → FINAL_STATUS_REPORT.txt (12 KB)
+    Read this to understand why execution wasn't direct, and what was prepared
+
+EXECUTION REPORT (Detailed Status):
+  → EXECUTION_REPORT.txt (12 KB)
+    Read this for detailed analysis of expected execution flow
+
+
+================================================================================
+                      EXECUTION RUNNERS
+================================================================================
+
+5 execution scripts are ready to use:
+
+1. FINAL_NOTEBOOK_RUNNER.py (11 KB) ← RECOMMENDED
+   - Full-featured Python runner
+   - Detailed logging with timestamps
+   - JSON result reporting
+   - Robust error handling
+   - Run: d:\unsloth\studio\.venv\Scripts\python.exe FINAL_NOTEBOOK_RUNNER.py
+
+2. run_all_commands.bat (2 KB)
+   - Pure batch file
+   - Simplest approach
+   - Run: run_all_commands.bat
+
+3. execute_notebook.py (4 KB)
+   - Alternative Python runner
+   - Similar to FINAL_NOTEBOOK_RUNNER.py
+   - Run: d:\unsloth\studio\.venv\Scripts\python.exe execute_notebook.py
+
+4. direct_exec.py (4 KB)
+   - Lightweight direct execution
+   - Minimal logging
+   - Run: d:\unsloth\studio\.venv\Scripts\python.exe direct_exec.py
+
+5. execute_commands.py (3 KB)
+   - Another variant
+   - Different approach
+   - Run: d:\unsloth\studio\.venv\Scripts\python.exe execute_commands.py
+
+
+================================================================================
+                    WHAT TO EXPECT
+================================================================================
+
+EXECUTION WILL SHOW:
+
+Phase 1: setup
+   - Creates directories
+   - Sets environment variables
+   - Detects Windows vs WSL
+
+Phase 2: deps_check
+   - Verifies torch, unsloth, datasets, trl
+   - Checks CUDA availability
+   - Shows GPU info
+
+Phase 3: model_load (takes 5-15 minutes first time)
+   - Downloads Gemma 4 model from Hugging Face
+   - Loads in 4-bit quantization
+   - Shows progress
+
+Phase 4: lora_attach
+   - Applies LoRA adapters
+
+Phase 5: dataset_load
+   - Loads training dataset
+
+Phase 6: prompt_formatting
+   - Formats prompts for training
+
+Phase 7: trainer_construction
+   - Initializes trainer
+
+Phase 8: train_step (takes 5-30 minutes)
+   - Runs training
+   - Shows loss values
+
+Phase 9: generation
+   - Tests text generation
+
+Phase 10: export
+   - Saves model and adapters
+
+TOTAL: 10-65+ minutes (first time), 5-35 minutes (subsequent)
+
+
+================================================================================
+                      HOW TO CHECK RESULTS
+================================================================================
+
+After execution completes:
+
+1. Check console output
+   - Look for: "✓ ALL PASSED" or "✗ SOME FAILED"
+
+2. Check exit code
+   Windows Command Prompt: echo %errorlevel%
+   - 0 = Success
+   - 1 = Failure
+
+3. Check JSON report
+   Command: type state\notebook-smoke\notebook_run_report.json
+   
+   Look for:
+   - "phases": Shows status of each phase (ok, failed, pending)
+   - "first_failure": Details if something failed
+
+4. Check for output files
+   - Model exports: state/notebook-smoke/exports/
+   - Checkpoints: state/notebook-smoke/runs/
+   - Logs: state/notebook-smoke/logs/
+
+
+================================================================================
+                    IF SOMETHING FAILS
+================================================================================
+
+1. READ THE ERROR MESSAGE carefully
+
+2. CHECK THE JSON REPORT:
+   type state\notebook-smoke\notebook_run_report.json
+   
+   This shows:
+   - Which phase failed
+   - The exact Python traceback
+   - Which line caused the error
+
+3. COMMON FIXES:
+
+   Missing packages (ModuleNotFoundError):
+   → pip install torch unsloth datasets trl accelerate
+   → Re-run the command
+
+   CUDA not available (RuntimeError: CUDA is required):
+   → Verify GPU: nvidia-smi
+   → Update GPU drivers
+   → Consider running in WSL2
+
+   Out of memory (CUDA out of memory):
+   → Reduce batch size: set JEMMA_BATCH_SIZE=1
+   → Use smaller model: set JEMMA_MODEL_NAME=unsloth/gemma-4-E2B-it
+   → Close other GPU applications
+
+   Network error (HuggingFace download):
+   → Check internet connection
+   → If behind proxy: huggingface-cli login
+   → Retry the command
+
+
+================================================================================
+                     TROUBLESHOOTING GUIDE
+================================================================================
+
+For detailed troubleshooting, see:
+→ README_NOTEBOOK_EXECUTION.md (section: IF SOMETHING FAILS)
+→ NOTEBOOK_EXECUTION_AUDIT.txt (section: FAILURE HANDLING & DEBUGGING)
+
+
+================================================================================
+                       ENVIRONMENT INFO
+================================================================================
+
+Python Interpreter:
+  d:\unsloth\studio\.venv\Scripts\python.exe
+
+Notebook:
+  d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb
+
+Runner Script:
+  d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py
+
+Output Report:
+  d:\JemmaRepo\Jemma\state\notebook-smoke\notebook_run_report.json
+
+Environment Variables (defaults):
+  JEMMA_WORKSPACE_DIR=d:\JemmaRepo\Jemma
+  JEMMA_DATA_DIR=d:\JemmaRepo\Jemma\state\notebook-smoke
+  JEMMA_MODEL_NAME=unsloth/gemma-4-E2B-it
+  JEMMA_MAX_SEQ_LENGTH=512
+  JEMMA_SMOKE_TEST_ROWS=8
+  JEMMA_BATCH_SIZE=1
+  JEMMA_EPOCHS=1
+  JEMMA_MAX_STEPS=1
+  JEMMA_GEN_MAX_NEW_TOKENS=64
+
+
+================================================================================
+                     NEXT STEPS (DO THIS NOW)
+================================================================================
+
+1. Copy this command:
+   cd /d d:\JemmaRepo\Jemma && d:\unsloth\studio\.venv\Scripts\python.exe FINAL_NOTEBOOK_RUNNER.py
+
+2. Open Command Prompt (cmd.exe)
+
+3. Paste the command and press Enter
+
+4. Wait for completion (10-60+ minutes)
+
+5. Check the results:
+   type state\notebook-smoke\notebook_run_report.json
+
+That's it! You're done.
+
+
+================================================================================
+                    NEED HELP?
+================================================================================
+
+See documentation files:
+1. README_NOTEBOOK_EXECUTION.md - Quick troubleshooting
+2. NOTEBOOK_EXECUTION_AUDIT.txt - Detailed guide
+3. FINAL_STATUS_REPORT.txt - Technical details
+
+Or check the JSON report for the exact error:
+   type state\notebook-smoke\notebook_run_report.json
+
+
+================================================================================
+                    PREPARED BY
+================================================================================
+
+GitHub Copilot CLI Agent
+Date: 2025-01-17
+Status: All infrastructure prepared and ready to execute
+Next: Awaiting manual execution via provided command

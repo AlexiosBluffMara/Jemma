@@ -1,0 +1,280 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  background: #08111f;
+  color: #edf2f7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: radial-gradient(circle at top, #13243c, #08111f 65%);
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.app-shell {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding: 24px;
+  border-radius: 18px;
+  background: rgba(8, 17, 31, 0.78);
+  border: 1px solid rgba(122, 162, 247, 0.24);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #7aa2f7;
+  font-size: 0.8rem;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 2.5rem;
+}
+
+.hero-copy {
+  max-width: 760px;
+  color: #c9d5e7;
+}
+
+.hero-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(58, 86, 130, 0.4);
+  border: 1px solid rgba(122, 162, 247, 0.24);
+}
+
+.badge-ok {
+  background: rgba(45, 165, 105, 0.25);
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.tab {
+  border: 1px solid rgba(122, 162, 247, 0.24);
+  background: rgba(12, 23, 39, 0.88);
+  color: #edf2f7;
+  border-radius: 999px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.tab.active,
+.tab:hover {
+  background: rgba(122, 162, 247, 0.22);
+}
+
+.tab-refresh {
+  margin-left: auto;
+}
+
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.two-up {
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+}
+
+.card {
+  border-radius: 18px;
+  background: rgba(8, 17, 31, 0.82);
+  border: 1px solid rgba(122, 162, 247, 0.18);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: 18px 20px 8px;
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.card-body {
+  padding: 0 20px 20px;
+}
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(122, 162, 247, 0.08);
+}
+
+.form {
+  display: grid;
+  gap: 14px;
+}
+
+.form label {
+  display: grid;
+  gap: 8px;
+}
+
+.form input,
+.form select,
+.form button {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(122, 162, 247, 0.24);
+  background: rgba(18, 31, 52, 0.92);
+  color: inherit;
+}
+
+.form button {
+  background: linear-gradient(135deg, #7aa2f7, #5b7cdb);
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(18, 31, 52, 0.72);
+  border: 1px solid rgba(122, 162, 247, 0.16);
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  display: inline-flex;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(18, 31, 52, 0.72);
+  border: 1px solid rgba(122, 162, 247, 0.16);
+}
+
+.list {
+  margin: 0;
+  padding-left: 18px;
+  color: #d6deeb;
+}
+
+.table {
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 10px;
+  text-align: left;
+  width: 100%;
+  border: 1px solid rgba(122, 162, 247, 0.14);
+  background: rgba(18, 31, 52, 0.72);
+  padding: 12px;
+  border-radius: 12px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.row.selected {
+  border-color: rgba(122, 162, 247, 0.65);
+  background: rgba(52, 78, 121, 0.44);
+}
+
+.progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(122, 162, 247, 0.14);
+  overflow: hidden;
+  margin: 10px 0 14px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #7aa2f7, #91f7d2);
+}
+
+.event-log {
+  display: grid;
+  gap: 10px;
+  max-height: 420px;
+  overflow: auto;
+}
+
+.event-row {
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(18, 31, 52, 0.72);
+  border: 1px solid rgba(122, 162, 247, 0.1);
+}
+
+pre,
+code {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error {
+  color: #ff8a8a;
+}
+
+@media (max-width: 800px) {
+  .hero {
+    flex-direction: column;
+  }
+
+  .tab-refresh {
+    margin-left: 0;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
+}

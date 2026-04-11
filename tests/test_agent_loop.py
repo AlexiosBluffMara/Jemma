@@ -39,7 +39,7 @@ class FakeProvider:
 
 class AgentLoopTests(unittest.TestCase):
     def test_runs_planned_inference_step(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
             root = Path(temp_dir)
             config = AppConfig(
                 repo_root=root,

@@ -25,10 +25,30 @@ This is the implementation base for **Jemma SafeBrain Command**: a local safety 
 python -m jemma.cli health
 python -m jemma.cli benchmark-solo --manifest manifests/benchmarks/gemma-solo-eval.toml
 python -m jemma.cli benchmark-versus --manifest manifests/benchmarks/gemma-head-to-head.toml
+python -m jemma.cli benchmark-stress --manifest manifests/benchmarks/gemma-stress-vs-reasoning.toml
 python -m jemma.cli run-objective --manifest manifests/objectives/lan-watch.toml
+python -m jemma.cli serve-api --host 127.0.0.1 --port 8000
 ```
 
-See `docs/agent-framework.md` for the architecture and safety model.
+## Web UI
+Jemma now includes a TypeScript mission-control frontend in `web/` for:
+
+- launching solo, pairwise, and stress benchmarks,
+- tracking live jobs over SSE,
+- reviewing completed runs and summaries,
+- monitoring provider and system telemetry.
+
+### Web UI dev loop
+```bash
+python -m jemma.cli serve-api --host 127.0.0.1 --port 8000
+cd web
+npm install
+npm run dev
+```
+
+The Vite dev server proxies `/api` to `http://127.0.0.1:8000`.
+
+See `docs/agent-framework.md` and `docs/web-ui-stack.md` for the architecture, safety model, and public-demo boundaries.
 
 ## Guides
 - Master rollout: docs/gemma4-e2b-e4b-local-rollout.md
@@ -36,8 +56,10 @@ See `docs/agent-framework.md` for the architecture and safety model.
 - Unsloth workflow: docs/unsloth-local-5090.md
 - Mobile deployment: docs/mobile-gemma4-setup.md
 - Public dataset plan: docs/second-brain-data-plan.md
+- Discord server blueprint: docs/discord-research-server-blueprint.md
 
 ## Toolbox
 - Fetch official Gemma 4 checkpoints: ./toolbox/fetch_gemma4_hf.sh
 - Register and quantize Ollama models: ./toolbox/setup_gemma4_ollama.sh
 - USB bridge for Pixel testing: ./toolbox/pixel_fold_adb_reverse.sh
+- Windows machine profiling: `powershell.exe -NoProfile -File .\toolbox\windows\profile-machine.ps1`

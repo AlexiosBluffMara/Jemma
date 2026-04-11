@@ -5,4 +5,6 @@ artifacts/runs/
 state/*.db
 state/*.sqlite
 configs/secrets.toml
+web\node_modules\
+web\dist\
 

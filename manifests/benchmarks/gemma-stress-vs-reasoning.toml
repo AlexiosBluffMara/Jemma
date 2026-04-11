@@ -1,0 +1,12 @@
+name = "gemma-stress-vs-reasoning"
+models = ["gemma4-e4b-it-q8", "gemma4-e2b-it-q4", "gemma4-e4b-it-bf16", "gemma4-e2b-it-bf16"]
+
+[datasets]
+standard = "datasets/prompts/stress-standard.jsonl"
+reasoning = "datasets/prompts/stress-reasoning.jsonl"
+
+[run]
+repetitions = 2
+warmup_runs = 1
+temperature = 0
+

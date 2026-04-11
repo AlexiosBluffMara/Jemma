@@ -12,7 +12,7 @@ from jemma.core.types import AppConfig, CapabilityPolicy
 
 class PolicyEngineTests(unittest.TestCase):
     def test_blocks_actuation_when_disabled(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
             root = Path(temp_dir)
             config = AppConfig(
                 repo_root=root,
@@ -47,7 +47,7 @@ class PolicyEngineTests(unittest.TestCase):
             self.assertIn("actuation is disabled in config", reasons)
 
     def test_allows_read_only_status_checks(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
             root = Path(temp_dir)
             config = AppConfig(
                 repo_root=root,

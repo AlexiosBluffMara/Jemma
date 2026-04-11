@@ -13,6 +13,7 @@ class ConfigLoaderTests(unittest.TestCase):
         repo_root = Path(__file__).resolve().parents[1]
         config = load_app_config(repo_root)
         self.assertIn("gemma4-e4b-it-q8", config.models)
+        self.assertIn("discord", config.capability_policies)
         self.assertIn("tailscale", config.capability_policies)
         self.assertFalse(config.actuation_enabled)
 

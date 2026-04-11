@@ -103,6 +103,17 @@ class PairwiseBenchmarkManifest:
 
 
 @dataclass(slots=True)
+class StressBenchmarkManifest:
+    name: str
+    models: list[str]
+    standard_dataset_path: Path
+    reasoning_dataset_path: Path
+    repetitions: int = 1
+    warmup_runs: int = 0
+    options: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
 class PlanStep:
     step_id: str
     kind: str
@@ -137,4 +148,23 @@ class AgentRunResult:
     steps: list[ExecutionResult]
     summary: str
     artifact_dir: Path
+
+
+@dataclass(slots=True)
+class JobRecord:
+    job_id: str
+    kind: str
+    status: str
+    visibility: str
+    created_at: str
+    started_at: str | None = None
+    finished_at: str | None = None
+    current_phase: str = "queued"
+    total_steps: int = 0
+    completed_steps: int = 0
+    models: list[str] = field(default_factory=list)
+    run_ids: list[str] = field(default_factory=list)
+    prompt_style: str = "standard"
+    error: str | None = None
+    summary: dict[str, Any] = field(default_factory=dict)
 

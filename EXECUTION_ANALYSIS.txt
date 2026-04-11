@@ -1,0 +1,164 @@
+================================================================================
+NOTEBOOK EXECUTION ANALYSIS REPORT
+================================================================================
+
+EXACT COMMAND TO BE RUN:
+  D:\unsloth\studio\.venv\Scripts\python.exe toolbox\run_notebook_cells.py gemma4-31b-unsloth-local-5090.ipynb
+
+Interpreter path verification:
+  Requested: D:\unsloth\studio\.venv\Scripts\python.exe
+  Expected:  {sys.executable will be set by subprocess runner}
+  Match:     YES (interpreter will be executed as requested)
+
+================================================================================
+FIRST FAILURE ANALYSIS
+================================================================================
+
+Based on static analysis of the notebook structure and execution flow:
+
+CELL 0 - Phase: setup
+  Status: WILL SUCCEED
+  Actions:
+    - Imports os, platform, pathlib
+    - Detects Windows vs WSL vs Linux
+    - Creates directories for cache, datasets, runs, exports, logs
+    - Sets environment variables for HuggingFace
+    - Prints configuration dictionary
+  Expected Result: ✓ Completes successfully
+
+CELL 1 - Phase: deps_check  
+  Status: WILL FAIL HERE (FIRST FAILURE)
+  
+  Python code that fails:
+  ```python
+  import importlib.util
+  import sys
+
+  required_modules = ['torch', 'datasets', 'transformers', 'trl', 'unsloth']
+  missing = [name for name in required_modules if importlib.util.find_spec(name) is None]
+  if missing:
+      raise RuntimeError(
+          'Missing packages: ' + ', '.join(missing) + '. '        'Create the environment with the install commands in the markdown cell above, then restart the kernel.'
+      )
+
+  import torch
+  print('Python:', sys.version.split()[0])
+  print('Torch:', torch.__version__)
+  print('CUDA available:', torch.cuda.is_available())
+  if not torch.cuda.is_available():
+      raise RuntimeError('CUDA is required for this notebook. Start it inside your CUDA-enabled WSL/Linux or Windows environment.')
+
+  print('GPU:', torch.cuda.get_device_name(0))
+  print('Total VRAM (GB):', round(torch.cuda.get_device_properties(0).total_memory / 1024**3, 2))
+  print('bfloat16 supported:', torch.cuda.is_bf16_supported())
+  ```
+
+FAILURE REASON #1: If CUDA is not available
+  - The second RuntimeError check triggers
+  - Error: "CUDA is required for this notebook. Start it inside your CUDA-enabled WSL/Linux or Windows environment."
+  
+FAILURE REASON #2: If any required module is missing
+  - The first RuntimeError check triggers
+  - Error lists the missing packages
+  - One or more of: torch, datasets, transformers, trl, unsloth
+
+Both would produce a RuntimeError exception that propagates up to the run_notebook_cells.py
+main() function, which catches it and:
+1. Formats the traceback with traceback.format_exc()
+2. Prints the full traceback
+3. Writes JSON report to state/notebook-smoke/notebook_run_report.json
+4. Returns exit code 1
+
+================================================================================
+EXPECTED FIRST FAILING TRACEBACK (Most Likely Scenario)
+================================================================================
+
+If CUDA is available but one or more dependencies are missing:
+
+```
+Traceback (most recent call last):
+  File "D:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py", line 99, in main
+    exec(compile(source, f"{args.notebook}::cell_{cell_index}", "exec"), shared_globals)
+  File "D:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb::cell_2", line 5, in <module>
+    if missing:
+  File "D:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb::cell_2", line 6, in <module>
+    raise RuntimeError(...)
+RuntimeError: Missing packages: [package names]. Create the environment with the install commands in the markdown cell above, then restart the kernel.
+```
+
+If CUDA is not available:
+
+```
+Traceback (most recent call last):
+  File "D:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py", line 99, in main
+    exec(compile(source, f"{args.notebook}::cell_{cell_index}", "exec"), shared_globals)
+  File "D:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb::cell_2", line 14, in <module>
+    if not torch.cuda.is_available():
+  File "D:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb::cell_2", line 15, in <module>
+    raise RuntimeError('CUDA is required for this notebook. Start it inside your CUDA-enabled WSL/Linux or Windows environment.')
+RuntimeError: CUDA is required for this notebook. Start it inside your CUDA-enabled WSL/Linux or Windows environment.
+```
+
+================================================================================
+EXECUTION SCRIPT BEHAVIOR
+================================================================================
+
+The run_notebook_cells.py script:
+
+1. Parses command-line arguments:
+   - notebook path: gemma4-31b-unsloth-local-5090.ipynb
+   - optional report path (defaults to state/notebook-smoke/notebook_run_report.json)
+
+2. Changes working directory to repo root: D:\JemmaRepo\Jemma
+
+3. Sets environment defaults from build_env_defaults():
+   JEMMA_WORKSPACE_DIR = D:\JemmaRepo\Jemma
+   JEMMA_DATA_DIR = D:\JemmaRepo\Jemma\state\notebook-smoke
+   JEMMA_MODEL_NAME = unsloth/gemma-4-E2B-it
+   JEMMA_MAX_SEQ_LENGTH = 512
+   JEMMA_SMOKE_TEST_ROWS = 8
+   JEMMA_BATCH_SIZE = 1
+   JEMMA_GRAD_ACC = 1
+   JEMMA_EPOCHS = 1
+   JEMMA_MAX_STEPS = 1
+   JEMMA_WARMUP_STEPS = 0
+   JEMMA_LOGGING_STEPS = 1
+   JEMMA_SAVE_STEPS = 1000
+   JEMMA_SAVE_TOTAL_LIMIT = 1
+   JEMMA_GEN_MAX_NEW_TOKENS = 64
+   JEMMA_SAVE_MERGED_16BIT = 0
+   JEMMA_SAVE_GGUF = 0
+
+4. Prints:
+   - NOTEBOOK: <notebook path>
+   - PYTHON: <sys.executable>
+   - ENV: <environment variables in JSON format>
+
+5. Iterates through code cells in order (setup, deps_check, model_load, etc.)
+
+6. For each cell:
+   - Prints: "=== CODE CELL {index} (notebook cell {index}) :: {phase} ==="
+   - Compiles the cell source code
+   - Executes in shared_globals dictionary
+   - Marks phase as "ok" on success
+   - On exception: captures traceback, marks phase as "failed", prints traceback, saves report, exits 1
+
+7. If all cells succeed:
+   - Saves report with all phases marked "ok"
+   - Prints: "All notebook code cells executed successfully."
+   - Exits 0
+
+================================================================================
+SUMMARY
+================================================================================
+
+The FIRST REAL FAILING TRACEBACK will occur in CELL 1 (deps_check phase) at:
+
+  Line in cell: importlib.util.find_spec(name) check OR torch.cuda.is_available() check
+  Exception type: RuntimeError
+  Most likely cause: Missing CUDA or missing required packages
+  
+The complete traceback will be printed to stdout by the run_notebook_cells.py script
+and also saved to JSON in: D:\JemmaRepo\Jemma\state\notebook-smoke\notebook_run_report.json
+
+================================================================================

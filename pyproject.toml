@@ -9,10 +9,15 @@ description = "Autonomous local Gemma agent framework with benchmark orchestrati
 readme = "README.md"
 requires-python = ">=3.11"
 authors = [{ name = "Copilot" }]
-dependencies = []
+dependencies = [
+  "discord.py>=2.4,<3",
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.35,<1",
+]
 
 [project.scripts]
 jemma = "jemma.cli:main"
+jemma-api = "jemma.api.app:main"
 
 [tool.setuptools]
 package-dir = { "" = "src" }

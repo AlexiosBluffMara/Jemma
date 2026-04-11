@@ -27,7 +27,7 @@ class FakeProvider:
 
 class BenchmarkRunnerTests(unittest.TestCase):
     def test_solo_summary_aggregates_passes(self) -> None:
-        with tempfile.TemporaryDirectory() as temp_dir:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
             root = Path(temp_dir)
             dataset = root / "datasets" / "smoke.jsonl"
             dataset.parent.mkdir(parents=True)

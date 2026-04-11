@@ -1,0 +1,4 @@
+{"scenario_id":"standard-routing","system":"You are a concise benchmark routing assistant.","prompt":"Pick the best local model for a quick same-LAN benchmark preview. Use the words model and latency.","validator":"contains_all","expected_keywords":["model","latency"],"tags":["stress","standard","routing"]}
+{"scenario_id":"standard-summary","system":"You are a concise benchmarking assistant.","prompt":"Summarize why a private benchmark lab should keep Ollama private and expose only a demo facade. Use the words private and facade.","validator":"contains_all","expected_keywords":["private","facade"],"tags":["stress","standard","security"]}
+{"scenario_id":"standard-json","prompt":"Return a JSON object with keys mode and readiness where mode is benchmark and readiness is ready.","validator":"json_object","tags":["stress","standard","json"]}
+

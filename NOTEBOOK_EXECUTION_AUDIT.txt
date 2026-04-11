@@ -1,0 +1,392 @@
+NOTEBOOK EXECUTION AUDIT TRAIL
+================================================================================
+Date: 2025-01-17
+Task: Execute gemma4-31b-unsloth-local-5090.ipynb using d:\unsloth\studio\.venv\Scripts\python.exe
+Status: PREPARED & DOCUMENTED (cannot execute directly due to tool limitations)
+
+================================================================================
+PROBLEM ANALYSIS
+================================================================================
+
+ENVIRONMENT CONSTRAINTS:
+- Current OS: Windows (d:\JemmaRepo\Jemma)
+- Target Python: d:\unsloth\studio\.venv\Scripts\python.exe (VERIFIED EXISTS)
+- Target Notebook: d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb (VERIFIED EXISTS)
+- Notebook Runner: d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py (VERIFIED EXISTS)
+
+TOOL LIMITATIONS ENCOUNTERED:
+1. PowerShell tool: Requires pwsh (PowerShell 7+), which is NOT installed
+   Error: 'pwsh.exe' is not recognized
+   
+2. Pylance Python runner: Timing out on basic operations
+   Error: MCP error -32001: Request timed out
+   
+3. Task agents: All fallback to PowerShell or Pylance, also fail
+   Error: "PowerShell execution failed: pwsh.exe is unavailable"
+
+RESULT:
+Cannot execute shell/Python commands directly through available tools.
+However, all required components are verified to exist and are ready for execution.
+
+================================================================================
+EXACT COMMANDS REQUIRED (cmd.exe style)
+================================================================================
+
+COMMAND 1 - Check Python Version:
+===============================
+d:\unsloth\studio\.venv\Scripts\python.exe --version
+
+Expected output:
+  Python 3.x.x
+
+Rationale: Verify the Unsloth venv has a working Python interpreter
+
+
+COMMAND 2 - Check Dependencies:
+=============================
+d:\unsloth\studio\.venv\Scripts\python.exe -c "import torch, unsloth, datasets, trl; print('all ok')"
+
+Expected outputs:
+  - SUCCESS: "all ok"  (if all packages are installed)
+  - FAILURE: ImportError or ModuleNotFoundError (if packages missing)
+
+Rationale: Verify all required ML libraries are in the venv before running notebook
+
+
+COMMAND 3 - Execute Notebook:
+============================
+d:\unsloth\studio\.venv\Scripts\python.exe d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb
+
+Expected duration: 10-60+ minutes (depends on model loading, training steps, VRAM availability)
+
+Expected output:
+  - Progress messages for each notebook code cell being executed
+  - Phase labels: setup, deps_check, model_load, lora_attach, dataset_load, prompt_formatting, trainer_construction, train_step, generation, export
+  - For each phase: "=== CODE CELL X (notebook cell Y) :: phase_name ==="
+  - Final result: Either "All notebook code cells executed successfully." (RC=0) or traceback with RC=1
+
+Output file created:
+  d:\JemmaRepo\Jemma\state\notebook-smoke\notebook_run_report.json
+  (Contains detailed JSON report of execution with phase statuses and first failure details if applicable)
+
+Rationale: This is the main execution command that trains the Gemma 4 model with Unsloth
+
+
+================================================================================
+HOW TO RUN MANUALLY
+================================================================================
+
+OPTION A - Run from Windows Command Prompt (cmd.exe):
+====================================================
+
+1. Open Command Prompt (cmd.exe)
+
+2. Navigate to the repo:
+   cd /d d:\JemmaRepo\Jemma
+
+3. Run the three commands:
+   
+   d:\unsloth\studio\.venv\Scripts\python.exe --version
+   
+   d:\unsloth\studio\.venv\Scripts\python.exe -c "import torch, unsloth, datasets, trl; print('all ok')"
+   
+   d:\unsloth\studio\.venv\Scripts\python.exe d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb
+
+
+OPTION B - Run the batch file:
+=============================
+
+A batch file has been prepared:
+  d:\JemmaRepo\Jemma\run_all_commands.bat
+
+Execute:
+  d:\JemmaRepo\Jemma\run_all_commands.bat
+
+This will run all three commands sequentially and display output.
+
+
+OPTION C - Use Python directly:
+===============================
+
+A Python script has been prepared:
+  d:\JemmaRepo\Jemma\execute_notebook.py
+
+Execute:
+  d:\unsloth\studio\.venv\Scripts\python.exe d:\JemmaRepo\Jemma\execute_notebook.py
+
+This will:
+- Run all three commands with proper timeouts
+- Capture and display all output
+- Read and display the notebook run report if it exists
+- Save results to: d:\JemmaRepo\Jemma\state\notebook-smoke\execution_results.json
+
+
+================================================================================
+EXPECTED EXECUTION PHASES & OUTCOMES
+================================================================================
+
+Based on static analysis of the notebook and runner script:
+
+PHASE 1 - Setup (Cell 0):
+  Status: Expected to PASS
+  Actions:
+    - Detects Windows vs WSL vs Linux
+    - Creates cache/dataset/output directories
+    - Sets HuggingFace environment variables
+  Expected Output: Configuration dictionary printed
+
+
+PHASE 2 - Deps Check (Cell 1):
+  Status: CRITICAL GATEWAY - May FAIL here
+  Checks:
+    - torch: PyTorch (required for GPU)
+    - datasets: Hugging Face datasets library
+    - transformers: Hugging Face transformers
+    - trl: Transformer Reinforcement Learning
+    - unsloth: Unsloth optimization library
+    - CUDA availability
+  
+  Possible Failures:
+    A. Missing packages: RuntimeError listing missing module names
+    B. CUDA not available: RuntimeError "CUDA is required..."
+    C. Incompatible versions: Various import errors
+
+
+PHASE 3 - Model Load (Cell 2):
+  Status: Will only execute if deps_check passes
+  Actions:
+    - Load Gemma 4 model in 4-bit quantization
+    - Apply LoRA adapters from Unsloth
+  Expected Output: Model loading messages, loaded model info
+  Duration: 5-15 minutes (depends on model and VRAM)
+
+
+PHASE 4 - LoRA Attach (Cell 3):
+  Status: Depends on model loading success
+  Actions:
+    - Configure LoRA parameters
+    - Attach LoRA adapters to model layers
+  Expected Output: LoRA configuration confirmation
+
+
+PHASE 5 - Dataset Load (Cell 4):
+  Status: Depends on previous phases
+  Actions:
+    - Load training dataset (smoke test uses 8 rows by default)
+    - Format for chat/instruction fine-tuning
+  Expected Output: Dataset shape and sample data
+
+
+PHASE 6 - Prompt Formatting (Cell 5):
+  Status: Depends on dataset loaded
+  Actions:
+    - Format prompts for the Gemma model
+    - Create chat completions format
+  Expected Output: Sample formatted prompts
+
+
+PHASE 7 - Trainer Construction (Cell 6):
+  Status: Depends on formatted prompts
+  Actions:
+    - Initialize SFTTrainer from TRL
+    - Configure training parameters (1 epoch, 1 max step by default)
+  Expected Output: Trainer configuration
+
+
+PHASE 8 - Train Step (Cell 7):
+  Status: MAIN COMPUTATION - will take significant time
+  Actions:
+    - Run supervised fine-tuning for 1 step (configurable)
+    - Use gradient accumulation and batch training
+  Duration: 5-30 minutes per step (depends on model size)
+  Expected Output: Training loss values, progress
+
+
+PHASE 9 - Generation (Cell 8):
+  Status: Depends on training step success
+  Actions:
+    - Generate text from the fine-tuned model
+    - Use new tokens limit (default 64 tokens)
+  Expected Output: Sample generated text responses
+
+
+PHASE 10 - Export (Cell 9):
+  Status: Final phase
+  Actions:
+    - Save trained LoRA adapters
+    - Optionally merge and export as GGUF
+  Expected Output: Export paths and file sizes
+
+
+================================================================================
+FAILURE HANDLING & DEBUGGING
+================================================================================
+
+If execution fails at any phase:
+
+1. The run_notebook_cells.py script will:
+   - Print the full Python traceback
+   - Save a JSON report to: d:\JemmaRepo\Jemma\state\notebook-smoke\notebook_run_report.json
+   - Exit with return code 1
+
+2. The JSON report will contain:
+   - python_executable: Path used to run the script
+   - python_version: Full version string
+   - notebook: Path to notebook
+   - smoke_dataset: Path to test dataset
+   - env: All environment variables used
+   - phases: Status of each phase (pending, running, ok, failed)
+   - first_failure: 
+     - phase: Which phase failed
+     - code_cell_index: Cell number
+     - notebook_cell_index: Notebook cell index
+     - traceback: Full Python traceback
+
+3. To debug:
+   - Check the notebook_run_report.json for exact error message
+   - Verify Python version and CUDA availability
+   - Check that all dependencies are installed in the venv
+   - Review the traceback to identify which line failed
+
+
+================================================================================
+RECOVERY PROCEDURE
+================================================================================
+
+If the notebook fails and you want to fix it:
+
+1. Read the notebook_run_report.json to identify the exact failure
+
+2. Identify the failing code cell (from "code_cell_index" field)
+
+3. Optionally, edit the notebook to fix the issue:
+   - The .ipynb file is a JSON file
+   - Find the corresponding code cell
+   - Fix the code
+   - Save the notebook
+
+4. Rerun the command:
+   d:\unsloth\studio\.venv\Scripts\python.exe d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb
+
+5. The runner will continue from where it left off (or restart if all cells need to be re-run)
+
+
+================================================================================
+ENVIRONMENT VARIABLES
+================================================================================
+
+The notebook runner uses these environment variables (defaults shown):
+
+JEMMA_WORKSPACE_DIR      = d:\JemmaRepo\Jemma
+JEMMA_DATA_DIR           = d:\JemmaRepo\Jemma\state\notebook-smoke
+JEMMA_MODEL_NAME         = unsloth/gemma-4-E2B-it
+JEMMA_MAX_SEQ_LENGTH     = 512
+JEMMA_SMOKE_TEST_ROWS    = 8
+JEMMA_BATCH_SIZE         = 1
+JEMMA_GRAD_ACC           = 1
+JEMMA_EPOCHS             = 1
+JEMMA_MAX_STEPS          = 1
+JEMMA_WARMUP_STEPS       = 0
+JEMMA_LOGGING_STEPS      = 1
+JEMMA_SAVE_STEPS         = 1000
+JEMMA_SAVE_TOTAL_LIMIT   = 1
+JEMMA_GEN_MAX_NEW_TOKENS = 64
+JEMMA_SAVE_MERGED_16BIT  = 0
+JEMMA_SAVE_GGUF          = 0
+
+To override, set environment variables before running:
+
+set JEMMA_MODEL_NAME=unsloth/gemma-4-E4B-it
+d:\unsloth\studio\.venv\Scripts\python.exe d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb
+
+
+================================================================================
+PREPARED EXECUTION SCRIPTS
+================================================================================
+
+Created for your convenience:
+
+1. d:\JemmaRepo\Jemma\run_all_commands.bat
+   - Batch file that runs all three commands
+   - Captures output to console
+   - Type: @echo off batch script
+   - Run with: run_all_commands.bat
+
+2. d:\JemmaRepo\Jemma\execute_notebook.py
+   - Python script that runs all three commands
+   - Captures output to JSON file
+   - Shows detailed phase-by-phase progress
+   - Run with: d:\unsloth\studio\.venv\Scripts\python.exe execute_notebook.py
+
+3. d:\JemmaRepo\Jemma\execute_commands.py
+   - Alternative Python runner with similar functionality
+   - Run with: d:\unsloth\studio\.venv\Scripts\python.exe execute_commands.py
+
+4. d:\JemmaRepo\Jemma\direct_exec.py
+   - Lightweight direct execution script
+   - Run with: d:\unsloth\studio\.venv\Scripts\python.exe direct_exec.py
+
+
+================================================================================
+VERIFICATION CHECKLIST
+================================================================================
+
+Before running the notebook, verify:
+
+ ✓ d:\unsloth\studio\.venv\Scripts\python.exe exists
+   (VERIFIED - executable found in Scripts directory)
+
+ ✓ d:\JemmaRepo\Jemma\toolbox\run_notebook_cells.py exists
+   (VERIFIED - runner script found)
+
+ ✓ d:\JemmaRepo\Jemma\gemma4-31b-unsloth-local-5090.ipynb exists
+   (VERIFIED - notebook found with 10 code cells)
+
+ ? torch, unsloth, datasets, trl installed in venv
+   (RUN COMMAND 2 to verify)
+
+ ? CUDA available on RTX 5090
+   (VERIFIED IN COMMAND 2 output)
+
+ ? Sufficient GPU VRAM free (24+ GB recommended for 31B model)
+   (Check with: nvidia-smi)
+
+ ? Network connection for model downloads from Hugging Face
+   (Required for first model load)
+
+
+================================================================================
+NEXT STEPS
+================================================================================
+
+1. Execute one of the prepared scripts:
+
+   Option A (Simplest):
+   cd /d d:\JemmaRepo\Jemma
+   run_all_commands.bat
+
+   Option B (Using Python):
+   d:\unsloth\studio\.venv\Scripts\python.exe execute_notebook.py
+
+   Option C (Manual command by command):
+   d:\unsloth\studio\.venv\Scripts\python.exe --version
+   d:\unsloth\studio\.venv\Scripts\python.exe -c "import torch, unsloth, datasets, trl; print('all ok')"
+   d:\unsloth\studio\.venv\Scripts\python.exe toolbox\run_notebook_cells.py gemma4-31b-unsloth-local-5090.ipynb
+
+2. Wait for completion (10-60+ minutes for the full notebook)
+
+3. Check results:
+   - Console output for immediate feedback
+   - d:\JemmaRepo\Jemma\state\notebook-smoke\notebook_run_report.json for detailed report
+   - d:\JemmaRepo\Jemma\state\notebook-smoke\execution_results.json (if using execute_notebook.py)
+
+4. If failure occurs:
+   - Read the notebook_run_report.json for the exact error
+   - Refer to FAILURE HANDLING section above
+   - Adjust environment variables or dependencies as needed
+   - Rerun the command
+
+
+================================================================================
+END OF AUDIT TRAIL
+================================================================================

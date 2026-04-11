@@ -13,6 +13,7 @@ from jemma.core.types import (
     ModelSpec,
     PairwiseBenchmarkManifest,
     SoloBenchmarkManifest,
+    StressBenchmarkManifest,
 )
 
 
@@ -50,6 +51,11 @@ def load_app_config(
 
     safety = base_data.get("safety", {})
     capability_policies = {
+        "discord": CapabilityPolicy(
+            capability="discord",
+            allowed_actions=["observe_blueprint", "build_invite_url", "render_channel_matrix", "render_ruleset"],
+            require_confirmation=False,
+        ),
         "tailscale": CapabilityPolicy(
             capability="tailscale",
             allowed_actions=["observe_status", "list_peers"],
@@ -141,6 +147,20 @@ def load_pairwise_manifest(repo_root: Path, path: Path) -> PairwiseBenchmarkMani
         left_model=data["left"]["model"],
         right_model=data["right"]["model"],
         dataset_path=dataset,
+        repetitions=int(run.get("repetitions", 1)),
+        warmup_runs=int(run.get("warmup_runs", 0)),
+        options=dict(run),
+    )
+
+
+def load_stress_manifest(repo_root: Path, path: Path) -> StressBenchmarkManifest:
+    data = _load_toml(path)
+    run = data.get("run", {})
+    return StressBenchmarkManifest(
+        name=data["name"],
+        models=list(data["models"]),
+        standard_dataset_path=repo_root / data["datasets"]["standard"],
+        reasoning_dataset_path=repo_root / data["datasets"]["reasoning"],
         repetitions=int(run.get("repetitions", 1)),
         warmup_runs=int(run.get("warmup_runs", 0)),
         options=dict(run),
