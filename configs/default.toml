@@ -7,6 +7,10 @@ artifacts_dir = "artifacts"
 base_url = "http://127.0.0.1:11434"
 timeout_s = 120
 
+[provider.llamacpp]
+base_url = "http://127.0.0.1:8080"
+timeout_s = 120
+
 [agent]
 default_model = "gemma4-e4b-it-q8"
 planner_model = "gemma4-e4b-it-q8"

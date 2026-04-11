@@ -100,19 +100,37 @@ The recommended public-data source bundle is in `docs/second-brain-data-plan.md`
 - Keep batch size 1 and adjust with gradient accumulation first.
 - Save LoRA adapters first; only export merged or GGUF artifacts when you need Ollama or mobile deployment.
 
-## Export path to Ollama and mobile
+## Export path to Ollama, llama.cpp, and mobile
 The notebook can save:
 
 - LoRA adapters,
 - merged checkpoints,
-- GGUF exports.
+- GGUF exports,
+- push to HuggingFace Hub.
 
 Recommended usage:
 
 1. fine-tune E4B in the notebook,
 2. export the adapter first,
-3. export a merged or GGUF version only when you are ready to register it in Ollama,
-4. use E2B exports for the mobile fallback path.
+3. export a merged or GGUF version only when you are ready to register it in Ollama or serve via llama.cpp,
+4. use E2B exports for the mobile fallback path,
+5. set `JEMMA_PUSH_TO_HUB=1` and `JEMMA_HUB_REPO=your-org/model-name` to publish weights.
+
+### Import into Ollama
+```bash
+python toolbox/import_gguf_to_ollama.py /path/to/model-Q8_0.gguf --model-name gemma4-e4b-finetuned
+```
+
+### Serve via llama.cpp
+```bash
+# Linux / WSL
+./toolbox/launch_llamacpp_server.sh /path/to/model-Q8_0.gguf
+
+# Windows PowerShell
+.\toolbox\launch_llamacpp_server.ps1 -GgufPath D:\path\to\model-Q8_0.gguf
+```
+
+The llama.cpp server exposes an OpenAI-compatible API at `http://127.0.0.1:8080` which the Jemma `LlamaCppProvider` connects to automatically.
 
 ## Deployment handoff
 The notebook executor now emits a deployment manifest after a successful run. When you want a hosted Ollama endpoint on Google Cloud:

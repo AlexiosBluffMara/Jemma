@@ -58,6 +58,8 @@ class AppConfig:
     artifacts_dir: Path
     ollama_base_url: str
     ollama_timeout_s: int
+    llamacpp_base_url: str
+    llamacpp_timeout_s: int
     default_model: str
     planner_model: str
     validator_model: str

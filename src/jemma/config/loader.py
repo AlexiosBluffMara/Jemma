@@ -82,6 +82,7 @@ def load_app_config(
 
     agent = base_data.get("agent", {})
     provider = base_data.get("provider", {}).get("ollama", {})
+    llamacpp = base_data.get("provider", {}).get("llamacpp", {})
     app = base_data.get("app", {})
     return AppConfig(
         repo_root=repo_root,
@@ -89,6 +90,8 @@ def load_app_config(
         artifacts_dir=repo_root / app.get("artifacts_dir", "artifacts"),
         ollama_base_url=provider.get("base_url", "http://127.0.0.1:11434"),
         ollama_timeout_s=int(provider.get("timeout_s", 120)),
+        llamacpp_base_url=llamacpp.get("base_url", "http://127.0.0.1:8080"),
+        llamacpp_timeout_s=int(llamacpp.get("timeout_s", 120)),
         default_model=agent.get("default_model", ""),
         planner_model=agent.get("planner_model", ""),
         validator_model=agent.get("validator_model", ""),

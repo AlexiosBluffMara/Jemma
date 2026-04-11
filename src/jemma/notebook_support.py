@@ -27,6 +27,8 @@ def build_env_defaults(repo_root: Path) -> dict[str, str]:
         "JEMMA_GEN_MAX_NEW_TOKENS": "64",
         "JEMMA_SAVE_MERGED_16BIT": "0",
         "JEMMA_SAVE_GGUF": "0",
+        "JEMMA_LORA_ALPHA": "8",
+        "JEMMA_PUSH_TO_HUB": "0",
     }
 
 

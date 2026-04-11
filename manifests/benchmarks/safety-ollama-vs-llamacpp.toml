@@ -1,0 +1,15 @@
+name = "safety-ollama-vs-llamacpp"
+
+[left]
+model = "gemma4-e4b-it-q8"
+
+[right]
+model = "gemma4-e4b-it-q8-llamacpp"
+
+[dataset]
+path = "datasets/prompts/safety-benchmark.jsonl"
+
+[run]
+repetitions = 3
+warmup_runs = 1
+temperature = 0

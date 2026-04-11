@@ -30,3 +30,19 @@ context_window = 131072
 quantization = "bf16"
 tags = ["baseline", "fallback"]
 
+[[models]]
+model_id = "gemma4-e4b-it-q8-llamacpp"
+provider = "llamacpp"
+remote_name = "gemma4-e4b-it-Q8_0"
+context_window = 131072
+quantization = "q8_0"
+tags = ["workstation", "llamacpp", "benchmark"]
+
+[[models]]
+model_id = "gemma4-e2b-it-q4-llamacpp"
+provider = "llamacpp"
+remote_name = "gemma4-e2b-it-Q4_K_M"
+context_window = 131072
+quantization = "q4_k_m"
+tags = ["edge", "llamacpp", "benchmark"]
+

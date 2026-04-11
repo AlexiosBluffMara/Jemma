@@ -1,0 +1,10 @@
+name = "safety-solo-eval"
+models = ["gemma4-e4b-it-q8", "gemma4-e2b-it-q4", "gemma4-e4b-it-q8-llamacpp", "gemma4-e2b-it-q4-llamacpp"]
+
+[dataset]
+path = "datasets/prompts/safety-benchmark.jsonl"
+
+[run]
+repetitions = 3
+warmup_runs = 1
+temperature = 0
