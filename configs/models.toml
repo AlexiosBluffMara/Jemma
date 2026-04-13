@@ -1,15 +1,15 @@
 [[models]]
 model_id = "gemma4-e4b-it-q8"
 provider = "ollama"
-remote_name = "gemma4-e4b-it:q8_0"
+remote_name = "gemma4:e4b"
 context_window = 131072
-quantization = "q8_0"
+quantization = "q4_k_m"
 tags = ["workstation", "default", "benchmark"]
 
 [[models]]
 model_id = "gemma4-e2b-it-q4"
 provider = "ollama"
-remote_name = "gemma4-e2b-it:q4_k_m"
+remote_name = "gemma4:e2b"
 context_window = 131072
 quantization = "q4_k_m"
 tags = ["fallback", "mobile", "benchmark"]
@@ -17,18 +17,34 @@ tags = ["fallback", "mobile", "benchmark"]
 [[models]]
 model_id = "gemma4-e4b-it-bf16"
 provider = "ollama"
-remote_name = "gemma4-e4b-it:bf16"
+remote_name = "gemma4-e4b-128k:latest"
 context_window = 131072
-quantization = "bf16"
+quantization = "q4_k_m"
 tags = ["baseline", "high-fidelity"]
 
 [[models]]
 model_id = "gemma4-e2b-it-bf16"
 provider = "ollama"
-remote_name = "gemma4-e2b-it:bf16"
+remote_name = "gemma4-e2b-128k:latest"
 context_window = 131072
-quantization = "bf16"
+quantization = "q4_k_m"
 tags = ["baseline", "fallback"]
+
+[[models]]
+model_id = "gemma4-26b-moe"
+provider = "ollama"
+remote_name = "gemma4:26b"
+context_window = 262144
+quantization = "q4_k_m"
+tags = ["reasoning", "benchmark"]
+
+[[models]]
+model_id = "gemma4-31b-dense"
+provider = "ollama"
+remote_name = "gemma4:31b"
+context_window = 262144
+quantization = "q4_k_m"
+tags = ["large", "benchmark"]
 
 [[models]]
 model_id = "gemma4-e4b-it-q8-llamacpp"

@@ -21,6 +21,8 @@ class ArtifactStoreTests(unittest.TestCase):
                 artifacts_dir=root / "artifacts",
                 ollama_base_url="http://127.0.0.1:11434",
                 ollama_timeout_s=120,
+                llamacpp_base_url="http://127.0.0.1:8080",
+                llamacpp_timeout_s=120,
                 default_model="m",
                 planner_model="m",
                 validator_model="m",

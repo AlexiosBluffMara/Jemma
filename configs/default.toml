@@ -5,7 +5,7 @@ artifacts_dir = "artifacts"
 
 [provider.ollama]
 base_url = "http://127.0.0.1:11434"
-timeout_s = 120
+timeout_s = 300
 
 [provider.llamacpp]
 base_url = "http://127.0.0.1:8080"

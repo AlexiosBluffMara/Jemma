@@ -1,0 +1,10 @@
+name = "safety-ollama-only"
+models = ["gemma4-e4b-it-q8", "gemma4-e2b-it-q4"]
+
+[dataset]
+path = "datasets/prompts/safety-benchmark.jsonl"
+
+[run]
+repetitions = 1
+warmup_runs = 0
+temperature = 0

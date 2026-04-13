@@ -212,6 +212,7 @@ class BenchmarkRunner:
             else [{"role": "user", "content": prompt}],
             options=options,
             response_format="json" if options.get("format") == "json" else None,
+            timeout_s=self.config.ollama_timeout_s,
         )
         started = perf_counter()
         response = self.provider.chat(request)

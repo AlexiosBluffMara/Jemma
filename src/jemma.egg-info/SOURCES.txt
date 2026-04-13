@@ -2,6 +2,7 @@ README.md
 pyproject.toml
 src/jemma/__init__.py
 src/jemma/cli.py
+src/jemma/notebook_support.py
 src/jemma.egg-info/PKG-INFO
 src/jemma.egg-info/SOURCES.txt
 src/jemma.egg-info/dependency_links.txt
@@ -15,12 +16,15 @@ src/jemma/api/app.py
 src/jemma/api/schemas.py
 src/jemma/api/routes/__init__.py
 src/jemma/api/routes/benchmarks.py
+src/jemma/api/routes/capabilities.py
+src/jemma/api/routes/chat.py
 src/jemma/api/routes/health.py
 src/jemma/api/routes/jobs.py
 src/jemma/api/routes/models.py
 src/jemma/api/routes/objectives.py
 src/jemma/api/routes/runs.py
 src/jemma/api/routes/system.py
+src/jemma/api/routes/training.py
 src/jemma/benchmarks/__init__.py
 src/jemma/benchmarks/runner.py
 src/jemma/benchmarks/system_probe.py
@@ -45,6 +49,7 @@ src/jemma/discord/bot.py
 src/jemma/discord/oauth.py
 src/jemma/providers/__init__.py
 src/jemma/providers/base.py
+src/jemma/providers/llamacpp.py
 src/jemma/providers/ollama.py
 src/jemma/providers/registry.py
 src/jemma/services/__init__.py
@@ -57,5 +62,7 @@ tests/test_config_loader.py
 tests/test_discord_blueprint.py
 tests/test_job_manager.py
 tests/test_notebook_execution.py
+tests/test_notebook_support.py
 tests/test_policies.py
+tests/test_prepare_ollama_cloud_bundle.py
 tests/test_store_queries.py

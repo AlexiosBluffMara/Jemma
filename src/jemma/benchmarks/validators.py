@@ -25,8 +25,14 @@ def validate_response(scenario: BenchmarkScenario, response_text: str) -> tuple[
         return not missing, score, reasons
 
     if scenario.validator == "json_object":
+        text = response_text.strip()
+        # Strip markdown code fences if present
+        if text.startswith("```"):
+            lines = text.split("\n")
+            lines = [ln for ln in lines if not ln.strip().startswith("```")]
+            text = "\n".join(lines).strip()
         try:
-            parsed = json.loads(response_text)
+            parsed = json.loads(text)
         except json.JSONDecodeError as exc:
             return False, 0.0, [f"invalid json: {exc.msg}"]
         if not isinstance(parsed, dict):
