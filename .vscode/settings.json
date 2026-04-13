@@ -1,0 +1,7 @@
+{
+    // Prevent agents and scripts from opening additional VS Code windows.
+    // Extra terminals are fine; new windows are not.
+    "window.openFoldersInNewWindow": "off",
+    "window.openFilesInNewWindow": "off",
+    "window.newWindowDimensions": "inherit"
+}
