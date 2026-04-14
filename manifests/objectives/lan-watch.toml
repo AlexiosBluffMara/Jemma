@@ -1,9 +1,0 @@
-name = "lan-watch"
-
-[objective]
-model = "gemma4-e4b-it-q8"
-fallback_model = "gemma4-e2b-it-q4"
-max_steps = 3
-prompt = "Inspect local network health using the available capabilities and summarize whether the workstation is ready for a benchmark run."
-success_criteria = ["ready", "network", "benchmark"]
-
