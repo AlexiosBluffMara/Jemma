@@ -1,3 +1,0 @@
-[console_scripts]
-jemma = jemma.cli:main
-jemma-api = jemma.api.app:main
