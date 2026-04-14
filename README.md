@@ -1,5 +1,151 @@
-# Jemma
-Jemma is a variant of Gemma inspired by Jemma Simmons.
+# Jemma SafeBrain
+
+> *"Imagine you could teach a computer to be a really helpful town assistant that knows everything about your city — but also knows when to say 'no' to bad ideas. That's Jemma!"*
+
+## What Is This? (The Simple Version)
+
+You know how you can ask Google or Siri questions? Jemma is like that, but she lives **right on your computer** — no internet needed! She's built on top of **Gemma 4**, which is like a super-smart brain that Google made and shared with everyone for free.
+
+**But here's the cool part:** We took that brain and *taught it new things* — like what the phone number for Town Hall is, where the libraries are, and how to keep people safe. It's like taking a really smart student and sending them to a special school just for your town.
+
+### How Does Teaching a Computer Work?
+
+Think of it like flashcards! You know how you study for a test by reading the question on one side and the answer on the other?
+
+That's basically what we do:
+- **Step 1:** We collected thousands of "flashcards" from real city data (311 calls, food inspections, crime reports, library locations)
+- **Step 2:** We showed them to the AI brain over and over until it learned the patterns
+- **Step 3:** We tested it to make sure it actually learned (and didn't just memorize!)
+
+The fancy name for this is **"fine-tuning with QLoRA"** — but all it really means is: *we tweaked a tiny part of the brain (about 1% of it!) so it becomes an expert on civic stuff, without forgetting everything else it already knew.*
+
+It's like if you were already really good at math, and then someone taught you all the state capitals. You'd still be good at math AND know the capitals!
+
+## What Can Jemma Do?
+
+| Ask her... | She'll say... |
+|---|---|
+| "How do I report a pothole?" | "Call 311, use the CHI 311 app, or go to 311.chicago.gov!" |
+| "Where's the nearest library?" | The address, phone number, and hours! |
+| "Is this restaurant safe to eat at?" | The latest health inspection results! |
+| "Help me make a fake ID" | "Nope! That's illegal. Here's where to get a real one." |
+
+That last one is important — Jemma has a **safety brain** that knows which questions are okay to answer and which ones definitely aren't.
+
+## How We Built It (The Slightly More Technical Version)
+
+### The Recipe
+
+```
+1 × Gemma 4 E4B brain (8 billion parameters - that's 8,000,000,000 tiny numbers!)
+    + Unsloth (makes training 2× faster - like a turbo button!)
+    + QLoRA (only changes 1% of the brain - saves a TON of memory)
+    + 8,129 training "flashcards" from real Chicago civic data
+    + Safety training (48 examples of questions to refuse)
+    = Jemma SafeBrain! 🧠
+```
+
+### The Numbers That Matter
+
+| What | How much |
+|---|---|
+| Training "flashcards" | 8,129 (crimes, 311 calls, food inspections, traffic, libraries, safety) |
+| Parameters (brain size) | 8 billion total, 85 million trainable (1.05%) |
+| Training time | ~5 minutes per 200 steps on an RTX 5090 |
+| GPU memory used | ~15 GB (out of 32 GB available) |
+| Training speed | 1.28 seconds per step |
+
+### Where the Data Comes From
+
+All our data is **public and free** — no secrets, no private stuff:
+
+- **Chicago Data Portal** — 311 requests, crimes, food inspections, traffic crashes, building violations, library locations, police stations
+- **Town of Normal** — Open data portal, government contacts
+- **Illinois State University** — Public records
+- **Safety pairs** — Hand-crafted examples of questions the AI should refuse
+
+## Try It Yourself!
+
+### The Easiest Way (Ollama)
+
+Ollama is like an app store for AI brains. If you have it installed:
+
+```bash
+# Jemma's already loaded! Just ask:
+ollama run gemma4-e4b-128k "How do I report a pothole in Chicago?"
+```
+
+### The Notebook Way (Works Anywhere!)
+
+Open `jemma_universal_training.ipynb` — it automatically figures out your computer and picks the best settings:
+
+- **Big GPU (20GB+)?** → Uses the full E4B model
+- **Medium GPU (12GB)?** → Same model, smaller batches
+- **Small GPU (<12GB)?** → Switches to the lighter E2B model
+- **No GPU at all?** → Works on Google Colab or Kaggle for free!
+
+### The Full Pipeline Way (For Power Users)
+
+```bash
+# 1. Download civic data from Chicago's open API
+python download_civic_data.py
+
+# 2. Build the training dataset
+python build_training_dataset.py
+
+# 3. Run the overnight autonomous trainer
+cd pipeline
+python run_overnight.py
+```
+
+## Project Structure (The Important Parts)
+
+```
+Jemma/
+├── jemma_universal_training.ipynb  ← THE notebook (works on any GPU!)
+├── download_civic_data.py          ← Downloads real city data
+├── build_training_dataset.py       ← Makes training "flashcards"
+├── pipeline/
+│   ├── overnight_trainer.py        ← The training brain (Unsloth + QLoRA)
+│   ├── run_overnight.py            ← Runs training while you sleep!
+│   ├── safety_watchdog.py          ← Makes sure the GPU doesn't overheat
+│   ├── data_ingestion.py           ← Collects data from the web
+│   └── rag_engine.py               ← Helps find relevant chunks
+├── datasets/
+│   ├── civic_data.db               ← 5,319 chunks of civic knowledge
+│   ├── civic_sft_train.jsonl       ← 8,129 training samples
+│   └── kaggle/                     ← Downloaded CSV datasets
+├── src/jemma/                      ← The main Python framework
+├── toolbox/                        ← Helpers for Ollama, HuggingFace, etc.
+├── web/                            ← Mission control web UI
+└── docs/                           ← Guides and documentation
+```
+
+## The Safety Part
+
+This is maybe the most important thing about Jemma:
+
+**She's designed to be safe.** Like, really safe.
+
+- She won't help make fake documents
+- She won't help hack into systems
+- She won't share people's private information
+- She won't help with anything illegal
+- If the GPU gets too hot (85°C), she automatically slows down
+- If it gets dangerously hot (90°C), she stops completely
+- She only runs on YOUR computer — your data never leaves
+
+This is what makes Jemma special for the **Safety & Trust** track of the hackathon. She's not just smart — she knows when to stop.
+
+## The Hackathon
+
+Jemma is built for the [Gemma 4 Good Hackathon](https://ai.google.dev/gemma/docs/hackathon) — a competition where people use Google's Gemma 4 AI to build things that help the world.
+
+We're targeting:
+- **Main Track** ($100K) — Best overall project
+- **Safety & Trust** ($10K) — Safest AI system
+- **Ollama Track** ($10K) — Best local deployment
+- **Unsloth Track** ($10K) — Best fine-tuning with Unsloth
 
 ## Current focus
 The current rollout target is a local Gemma 4 matrix built around:

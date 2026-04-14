@@ -163,3 +163,10 @@ workflow_report_new.txt
 WORKFLOW_INDEX.txt
 WORKFLOW_INSTRUCTIONS.md
 
+# ── Large data downloads ─────────────────────────────────────────────────────
+datasets/kaggle_downloads/
+datasets/kaggle/*.csv
+datasets/*.jsonl
+_test_training.py
+_validate_pipeline.py
+

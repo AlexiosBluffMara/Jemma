@@ -80,8 +80,7 @@ def forward(self, input: Tensor, output_size: list[int] | None = None) -> Tensor
             "Only `zeros` padding mode is supported for ConvTranspose1d"
         )
 
-    if not isinstance(self.padding, tuple):
-        raise AssertionError("self.padding must be a tuple")
+    assert isinstance(self.padding, tuple)
     # One cannot replace List by Tuple or Sequence in "_output_padding" because
     # TorchScript does not support `Sequence[T]` or `Tuple[T, ...]`.
     num_spatial_dims = 1

@@ -3,5 +3,30 @@
     // Extra terminals are fine; new windows are not.
     "window.openFoldersInNewWindow": "off",
     "window.openFilesInNewWindow": "off",
-    "window.newWindowDimensions": "inherit"
+    "window.newWindowDimensions": "inherit",
+
+    // GitHub Copilot — Agent & Chat configuration
+    "chat.agent.enabled": true,
+    "chat.agent.maxRequests": 100,
+    "chat.promptFilesRecommendations": true,
+
+    // Python — workspace interpreter
+    "python.defaultInterpreterPath": "${workspaceFolder}\\.venv_multimodal\\Scripts\\python.exe",
+
+    // Files — hide noisy root-level legacy scripts from explorer
+    "files.exclude": {
+        "**/__pycache__": true,
+        "**/.pytest_cache": true,
+        "**/node_modules": true
+    },
+
+    // Search — exclude build artifacts and large data
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/dist": true,
+        "**/.venv*": true,
+        "**/checkpoints": true,
+        "datasets/kaggle": true,
+        "datasets/synth": true
+    }
 }

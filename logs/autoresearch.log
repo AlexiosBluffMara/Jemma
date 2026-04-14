@@ -1,0 +1,58 @@
+2026-04-13 21:52:54,130 [autoresearch] INFO Starting AutoResearch (iterations=3, questions/iter=20, min_score=0.7)
+2026-04-13 21:52:54,130 [autoresearch] INFO Model: gemma4:e4b
+2026-04-13 21:52:54,130 [autoresearch] INFO Current state: iteration=0, dataset_size=0
+2026-04-13 21:52:54,130 [autoresearch] INFO 
+======================================================================
+2026-04-13 21:52:54,130 [autoresearch] INFO AutoResearch Iteration 1
+2026-04-13 21:52:54,130 [autoresearch] INFO ======================================================================
+2026-04-13 21:53:00,168 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:06,074 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:06,109 [autoresearch] INFO Generated 12 questions
+2026-04-13 21:53:10,586 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:15,070 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:19,557 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:24,041 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:28,519 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:33,019 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:37,515 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:42,004 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:46,505 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:51,031 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:53:55,600 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:00,145 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:00,534 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:00,892 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:01,260 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:01,619 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:01,985 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:02,367 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:02,726 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:03,078 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:03,483 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:03,862 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:04,212 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:04,594 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:04,595 [autoresearch] INFO Added 8/12 samples to datasets\civic_sft_expanded.jsonl
+2026-04-13 21:54:04,679 [autoresearch] INFO Merged dataset: 5902 unique samples → datasets\civic_sft_combined.jsonl
+2026-04-13 21:54:04,685 [autoresearch] INFO Iteration took 70.6s
+2026-04-13 21:54:04,685 [autoresearch] INFO Cooling down 5s before next iteration...
+2026-04-13 21:54:09,685 [autoresearch] INFO 
+======================================================================
+2026-04-13 21:54:09,685 [autoresearch] INFO AutoResearch Iteration 2
+2026-04-13 21:54:09,685 [autoresearch] INFO ======================================================================
+2026-04-13 21:54:14,926 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:18,977 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:18,978 [autoresearch] INFO Generated 19 questions
+2026-04-13 21:54:23,528 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:28,081 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:32,472 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:36,991 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:41,498 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:46,090 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:49,671 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:54,200 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:54:58,682 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:55:02,931 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:55:06,720 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:55:11,198 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-04-13 21:55:15,721 [httpx] INFO HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"

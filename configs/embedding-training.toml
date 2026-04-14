@@ -1,0 +1,159 @@
+# Jemma Embedding Training Configuration
+# Trimodal Gemma 4 Embedding models (E2B + E4B)
+
+[general]
+project_name = "jemma-embed"
+output_dir = "checkpoints/embedding"
+log_dir = "logs/embedding"
+state_file = "state/embedding_state.json"
+seed = 42
+
+# ---------------------------------------------------------------------------
+# Model variants
+# ---------------------------------------------------------------------------
+[models.e2b]
+hf_name = "unsloth/gemma-4-E2B-it"
+embed_dim = 2304            # Gemma 4 E2B hidden size
+matryoshka_dims = [256, 512, 1024, 2304]
+max_seq_length = 8192       # embeddings don't need 131K
+dtype = "bfloat16"
+
+[models.e4b]
+hf_name = "unsloth/gemma-4-E4B-it"
+embed_dim = 3072            # Gemma 4 E4B hidden size
+matryoshka_dims = [256, 512, 1024, 2048, 3072]
+max_seq_length = 8192
+dtype = "bfloat16"
+
+# ---------------------------------------------------------------------------
+# QLoRA config
+# ---------------------------------------------------------------------------
+[qlora]
+r = 64                     # Higher rank for embedding quality
+lora_alpha = 128
+target_modules = [
+    "q_proj", "k_proj", "v_proj", "o_proj",
+    "gate_proj", "up_proj", "down_proj",
+]
+lora_dropout = 0.05
+bias = "none"
+quantization_bits = 4
+
+# ---------------------------------------------------------------------------
+# Training phases
+# ---------------------------------------------------------------------------
+[training.phase1_text]
+description = "Text-only contrastive learning"
+epochs = 3
+batch_size = 32
+learning_rate = 2e-4
+warmup_ratio = 0.05
+lr_scheduler = "cosine"
+weight_decay = 0.01
+gradient_accumulation = 4
+max_steps = 10000
+temperature = 0.02          # InfoNCE temperature
+hard_negatives_per_query = 7
+eval_steps = 500
+save_steps = 1000
+
+[training.phase2_multimodal]
+description = "Cross-modal contrastive alignment"
+epochs = 2
+batch_size = 16             # Smaller due to multimodal inputs
+learning_rate = 5e-5        # Lower LR for alignment
+warmup_ratio = 0.1
+lr_scheduler = "cosine"
+weight_decay = 0.01
+gradient_accumulation = 8
+max_steps = 8000
+temperature = 0.02
+modality_weights = { text = 1.0, image = 1.0, audio = 0.8 }
+eval_steps = 400
+save_steps = 800
+
+[training.phase3_matryoshka]
+description = "Matryoshka dimension training"
+epochs = 1
+batch_size = 64
+learning_rate = 1e-4
+warmup_ratio = 0.05
+max_steps = 3000
+eval_steps = 300
+
+# ---------------------------------------------------------------------------
+# Datasets
+# ---------------------------------------------------------------------------
+[datasets.msmarco]
+path = "datasets/embedding/msmarco_triplets.jsonl"
+type = "triplet"            # query, positive, negative
+max_samples = 500000
+
+[datasets.nli]
+path = "datasets/embedding/allnli_pairs.jsonl"
+type = "pair"               # anchor, positive
+max_samples = 275000
+
+[datasets.coco_captions]
+path = "datasets/embedding/coco_captions.jsonl"
+type = "image_text_pair"
+max_samples = 118000
+
+[datasets.audiocaps]
+path = "datasets/embedding/audiocaps.jsonl"
+type = "audio_text_pair"
+max_samples = 46000
+
+[datasets.civic_pairs]
+path = "datasets/embedding/civic_pairs.jsonl"
+type = "pair"
+description = "Custom civic data for Jemma domain"
+max_samples = 50000
+
+# ---------------------------------------------------------------------------
+# Evaluation / Benchmarks
+# ---------------------------------------------------------------------------
+[benchmark]
+eval_batch_size = 64
+mteb_tasks = [
+    "STS17", "STSBenchmark", "SICK-R",
+    "AmazonReviewsClassification", "TweetSentimentExtraction",
+    "ArguAna", "FiQA2018", "NFCorpus", "SciFact",
+    "SprintDuplicateQuestions", "TwitterURLCorpus",
+]
+mteb_languages = ["en"]
+cross_modal_eval = true
+
+# Competitor models to benchmark against
+[benchmark.competitors]
+text_models = [
+    "all-MiniLM-L6-v2",
+    "BAAI/bge-large-en-v1.5",
+    "intfloat/e5-mistral-7b-instruct",
+    "Alibaba-NLP/gte-Qwen2-7B-instruct",
+    "nvidia/NV-Embed-v2",
+]
+multimodal_models = [
+    "jinaai/jina-clip-v2",
+    "openai/clip-vit-large-patch14",
+    "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k",
+]
+
+# ---------------------------------------------------------------------------
+# Safety
+# ---------------------------------------------------------------------------
+[safety]
+gpu_temp_warning = 80
+gpu_temp_throttle = 85
+gpu_temp_emergency = 90
+cooldown_seconds = 60
+monitor_interval = 10
+min_disk_gb = 10
+
+# ---------------------------------------------------------------------------
+# Export
+# ---------------------------------------------------------------------------
+[export]
+hf_repo_e2b = "soumitty/jemma-embed-gemma-4-e2b"
+hf_repo_e4b = "soumitty/jemma-embed-gemma-4-e4b"
+gguf_quants = ["q8_0", "q4_k_m"]

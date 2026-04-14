@@ -1,0 +1,25 @@
+{
+  "phase": 4,
+  "started_at": "2026-04-14T00:27:48.701293",
+  "ingestion_done": true,
+  "rag_done": true,
+  "training_started": true,
+  "training_iterations": 50,
+  "best_score": 0,
+  "export_done": false,
+  "errors": [],
+  "updated_at": "2026-04-14T00:43:54.295304",
+  "ingestion_results": {
+    "DataIllinois": 0,
+    "Kaggle": 10,
+    "HuggingFace": 11,
+    "Normal": 116,
+    "Chicago": 5,
+    "ISU": 12
+  },
+  "rag_chunks": 299,
+  "training_completed": 0,
+  "training_improved": 0,
+  "total_elapsed_s": 965.6995463371277,
+  "completed_at": "2026-04-14T00:43:54.295304"
+}
